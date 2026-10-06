@@ -5,68 +5,98 @@
 
 ## 1. Project Health & Sprint Metadata
 
-- **Current State**: Phase 1 Initialized (Governance & Architecture Baseline Locked)
-- **Repository Health**: 🟢 GREEN — Architecture & Data Contracts Formalized
-- **Active Sprint**: Sprint 1 (Core Foundations & Pipeline Verification)
-- **Last Sync Timestamp**: 2026-10-06T23:36:40+05:30
+- **Current State**: Phase 1 Complete (Governance & Architectural Baseline Locked)
+- **Repository Health**: 🟢 GREEN — Architecture, Data Contracts & Git Remote Linked
+- **Active Sprint**: Sprint 1 (Phase 2 Core Implementation)
+- **Git Tracking**: Branch `main` tracking `origin/main` (`https://github.com/MayurRajeshKeni/codeguardian.git`)
+- **Last Sync Timestamp**: 2026-10-06T23:51:00+05:30
 - **Team Size**: Exactly 2 Members
 
 ---
 
-## 2. Live Task Matrix
+## 2. Live Task Board (Split by Member)
 
-| Component / Task | Owner | Status | Target Phase | Notes / Blockers |
-| :--- | :--- | :--- | :--- | :--- |
-| **PRD.md & Course Mapping** | Lead Architect | ✅ Completed | Phase 1 | Mapped to BCSE307L & BCSE307P |
-| **Architecture.md & Schemas** | Lead Architect | ✅ Completed | Phase 1 | `AST.json`, `CFG.json`, `Audit.json` locked |
-| **Rules.md & Guardrails** | Lead Architect | ✅ Completed | Phase 1 | Forbidden libs & C11/monotone rules locked |
-| **Phases.md Roadmap** | Lead Architect | ✅ Completed | Phase 1 | 5-phase execution plan locked |
-| **Design.md (UI & Cytoscape)** | Lead Architect | ✅ Completed | Phase 1 | Dark terminal palette & graph spec locked |
-| **Flex Lexer (`scanner.l`)** | Member 1 | ⏳ Pending Start | Phase 2 | Mini-C token specifications |
-| **Bison Parser (`parser.y`)** | Member 1 | ⏳ Pending Start | Phase 2 | Deterministic LALR(1) grammar |
-| **AST Builder (`ast.c`/`ast.h`)** | Member 1 | ⏳ Pending Start | Phase 2 | Typed AST nodes + JSON export |
-| **TAC Generator (`tac.c`/`tac.h`)**| Member 1 | ⏳ Pending Start | Phase 2 | SDT quadruples + temporary numbering |
-| **CFG Leader Partitioning** | Member 1 | ⏳ Pending Start | Phase 2 | Dragon Book leader algorithm |
-| **CFG Serializer (`json_emit.c`)**| Member 1 | ⏳ Pending Start | Phase 2 | Produces compliant `CFG.json` |
-| **Security Rules Definition** | Member 2 | ⏳ Pending Start | Phase 2 | `security_rules.json` (Sources, Sinks, Sanitizers) |
-| **Monotone Worklist Solver** | Member 2 | ⏳ Pending Start | Phase 2 | Kildall fixpoint LFP solver |
-| **Audit Path Tracing Engine** | Member 2 | ⏳ Pending Start | Phase 2 | Source-to-sink path extractor |
-| **Pipeline CLI Bridge** | Joint | ⏳ Pending Start | Phase 3 | Pipes frontend output into backend |
-| **Vite + React Dashboard Scaffolding** | Member 2 | ⏳ Pending Start | Phase 4 | UI shell & editor layout |
-| **Cytoscape.js Graph Canvas** | Member 2 | ⏳ Pending Start | Phase 4 | Dagre layout + Green/Amber/Red state badges |
-| **Interactive Block Drawer** | Member 2 | ⏳ Pending Start | Phase 4 | IN/OUT/GEN/KILL tabular inspector |
-| **Benchmark & Demo Suite** | Joint | ⏳ Pending Start | Phase 5 | `clean_flow.c`, `sql_injection.c`, etc. |
+### 👤 Member 1: Compiler Core & Front-End / Middle-End Lowering
+> **Domain**: Flex Lexer, Bison Parser, AST Synthesis, SDT to TAC, Leader Partitioning, CFG Generation $\to$ `CFG.json`
+
+#### 🟢 Completed
+- [x] **[Phase 1]** Define deterministic Mini-C grammar bounds (no pointers, no dynamic heap, strict scalar types)
+- [x] **[Phase 1]** Review & freeze `AST.json` and `CFG.json` data contracts with Member 2
+- [x] **[Phase 1]** Initial `.gitignore` setup for compiler build artifacts (`lex.yy.c`, `parser.tab.*`, `*.o`, `*.exe`)
+
+#### 🟡 In Progress / Next Up
+- [ ] **[Phase 2]** Author `compiler_core/src/scanner.l` (Flex token specs for keywords, identifiers, literals, operators)
+- [ ] **[Phase 2]** Author `compiler_core/src/parser.y` (Bison LALR(1) grammar; resolve dangling-else with `%nonassoc`)
+- [ ] **[Phase 2]** Implement `ast.h` / `ast.c` (In-memory AST node allocators, node types, and AST print/JSON routines)
+
+#### ⚪ Backlog
+- [ ] **[Phase 2]** Implement `tac.h` / `tac.c` (Syntax-Directed Translation lowering AST to linear TAC quadruples)
+- [ ] **[Phase 2]** Implement Dragon Book 3-rule leader partitioning algorithm
+- [ ] **[Phase 2]** Implement `cfg.h` / `cfg.c` (Group basic blocks and wire true/false/unconditional directed edges)
+- [ ] **[Phase 2]** Implement `json_emit.c` (Serialize basic blocks and edges into valid `CFG.json`)
+- [ ] **[Phase 2]** Unit test suite in `compiler_core/tests/` (`test_simple.c`, `test_branch.c`, `test_loop.c`)
+
+---
+
+### 👤 Member 2: Security Intelligence, Data-Flow Math Engine & UI
+> **Domain**: Security Rules, Kildall Worklist Lattice Solver, Audit Synthesis, React + Cytoscape.js Dashboard
+
+#### 🟢 Completed
+- [x] **[Phase 1]** Define security threat model (Sources, Sanitizers, Sinks)
+- [x] **[Phase 1]** Specify mathematical transfer equations ($IN$, $OUT$, $GEN$, $KILL$)
+- [x] **[Phase 1]** Freeze `Audit.json` schema and create initial sample fixture
+
+#### 🟡 In Progress / Next Up
+- [ ] **[Phase 2]** Setup `security_engine/` environment and author `security_rules.json` (CWE-89, CWE-78, CWE-79)
+- [ ] **[Phase 2]** Implement block-level $GEN$ and $KILL$ set extractors from TAC instructions
+- [ ] **[Phase 2]** Implement Kildall monotone worklist fixpoint solver over powerset lattice $(\mathcal{P}(V), \subseteq)$:
+  $$IN[B] = \bigcup_{P \in \text{Pred}[B]} OUT[P]$$
+  $$OUT[B] = GEN[B] \cup (IN[B] \setminus KILL[B])$$
+
+#### ⚪ Backlog
+- [ ] **[Phase 2]** Implement source-to-sink vulnerability path trace extractor
+- [ ] **[Phase 2]** Build solver verification unit tests (`solver.test.js` against sample CFG fixtures)
+- [ ] **[Phase 4]** Initialize Vite + React project in `dashboard/` with dark terminal styling tokens
+- [ ] **[Phase 4]** Implement dual-pane layout (Code editor on left, Cytoscape canvas on right)
+- [ ] **[Phase 4]** Integrate Cytoscape.js with `dagre` layout and color states (Green = Clean, Amber = Tainted, Red = Vulnerable)
+- [ ] **[Phase 4]** Build interactive Block Detail Drawer displaying full TAC table and $IN/OUT/GEN/KILL$ sets
+- [ ] **[Phase 4]** Build Vulnerability Trace Bar highlighting active attack paths on the graph
+
+---
+
+### 🤝 Shared / Joint Milestones
+
+#### 🟢 Completed
+- [x] **[Phase 1]** System Requirements & Syllabus Mapping ([PRD.md](file:///c:/Users/asus/OneDrive/Documents/Projects/CD_CodeGuardian/PRD.md))
+- [x] **[Phase 1]** System Architecture & Data Contracts ([Architecture.md](file:///c:/Users/asus/OneDrive/Documents/Projects/CD_CodeGuardian/Architecture.md))
+- [x] **[Phase 1]** Technical Guardrails & Rules ([Rules.md](file:///c:/Users/asus/OneDrive/Documents/Projects/CD_CodeGuardian/Rules.md))
+- [x] **[Phase 1]** 5-Phase Roadmap ([Phases.md](file:///c:/Users/asus/OneDrive/Documents/Projects/CD_CodeGuardian/Phases.md))
+- [x] **[Phase 1]** UI & Visual Styling Spec ([Design.md](file:///c:/Users/asus/OneDrive/Documents/Projects/CD_CodeGuardian/Design.md))
+- [x] **[Phase 1]** Remote Git Repository Linked & Pushed to GitHub
+
+#### ⚪ Backlog
+- [ ] **[Phase 3]** End-to-End Pipeline Integration (`codeguardian-frontend code.c | codeguardian-engine` $\to$ `Audit.json`)
+- [ ] **[Phase 3]** Integration acceptance test suite (`clean_flow.c`, `sql_injection.c`, `command_injection.c`, `complex_loop.c`)
+- [ ] **[Phase 5]** End-to-end benchmark timing suite (< 300ms execution target)
+- [ ] **[Phase 5]** BCSE307L / BCSE307P Academic Demo & Final Documentation Package
 
 ---
 
 ## 3. Synchronization Checkpoints & Data Contract Status
 
 ### 3.1 Contract Lock Status
-- **`CFG.json` (Member 1 $\to$ Member 2)**: 🔒 **LOCKED**. Schema frozen in [Architecture.md §3.2](file:///c:/Users/asus/OneDrive/Documents/Projects/CD_CodeGuardian/Architecture.md#32-cfgjson-control-flow-graph-contract). Member 2 can safely build and test against mock data.
-- **`Audit.json` (Member 2 $\to$ Dashboard)**: 🔒 **LOCKED**. Schema frozen in [Architecture.md §3.3](file:///c:/Users/asus/OneDrive/Documents/Projects/CD_CodeGuardian/Architecture.md#33-auditjson-security-findings--taint-lattice-state).
-- **Transfer Functions (Mathematical Rigor)**: 🔒 **LOCKED**. Kildall forward may-analysis transfer equations:
+- **`CFG.json` (Member 1 $\to$ Member 2)**: 🔒 **LOCKED** ([Architecture.md §3.2](file:///c:/Users/asus/OneDrive/Documents/Projects/CD_CodeGuardian/Architecture.md#32-cfgjson-control-flow-graph-contract)). Member 2 builds against this contract independently.
+- **`Audit.json` (Member 2 $\to$ Dashboard)**: 🔒 **LOCKED** ([Architecture.md §3.3](file:///c:/Users/asus/OneDrive/Documents/Projects/CD_CodeGuardian/Architecture.md#33-auditjson-security-findings--taint-lattice-state)).
+- **Transfer Functions (Mathematical Rigor)**: 🔒 **LOCKED**.
   $$IN[B] = \bigcup_{P \in \text{Pred}[B]} OUT[P]$$
   $$OUT[B] = GEN[B] \cup (IN[B] \setminus KILL[B])$$
 
 ---
 
-## 4. Current Blockers & Risks
+## 4. Current Blockers & Active Risk Mitigations
 
-| ID | Description | Impact | Mitigation Strategy |
-| :--- | :--- | :--- | :--- |
-| **RISK-01** | Shift/Reduce conflicts in grammar during dangling-else resolution. | Low | Use standard Bison precedence declarations: `%nonassoc LOWER_THAN_ELSE` and `%nonassoc ELSE`. |
-| **RISK-02** | Cyclic CFG loops causing infinite fixpoint worklist iteration. | None | Monotonicity guarantees termination because variable sets over finite variables $V$ can only grow up to $|V|$. |
-| **RISK-03** | Discrepancy in JSON output formatting between C backend and JS parser. | Low | Strict schema validation tests against `CFG.json` before feeding to solver. |
-
----
-
-## 5. Next Immediate Actions
-
-1. **Member 1**:
-   - Initialize `compiler_core/` directory structure.
-   - Author `compiler_core/src/scanner.l` and `compiler_core/src/parser.y`.
-   - Implement AST and TAC data structures.
-2. **Member 2**:
-   - Initialize `security_engine/` and `dashboard/` scaffolding.
-   - Author `security_engine/src/security_rules.json`.
-   - Build unit test verifying the Kildall worklist algorithm using the sample contract from `Architecture.md`.
+| ID | Description | Impact | Mitigation Strategy | Owner |
+| :--- | :--- | :--- | :--- | :--- |
+| **RISK-01** | Shift/Reduce conflicts in grammar during dangling-else resolution. | Low | Use standard Bison precedence declarations: `%nonassoc LOWER_THAN_ELSE` and `%nonassoc ELSE`. | Member 1 |
+| **RISK-02** | Cyclic CFG loops causing infinite fixpoint worklist iteration. | None | Monotonicity guarantees termination because variable sets over finite variables $V$ strictly accumulate/shrink. | Member 2 |
+| **RISK-03** | JSON formatting divergence between C backend and JS parser. | Low | Schema validation step during integration test runs. | Joint |
