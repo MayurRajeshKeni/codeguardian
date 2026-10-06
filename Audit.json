@@ -1,0 +1,47 @@
+{
+    "summary": {
+        "vulnerabilities_detected": 1,
+        "status": "VULNERABLE"
+    },
+    "block_states": {
+        "B0": {
+            "gen": [
+                "userInput"
+            ],
+            "kill": [],
+            "in": [],
+            "out": [
+                "userInput"
+            ],
+            "is_tainted": true
+        },
+        "B1": {
+            "gen": [],
+            "kill": [],
+            "in": [
+                "userInput"
+            ],
+            "out": [
+                "userInput"
+            ],
+            "is_tainted": true
+        }
+    },
+    "findings": [
+        {
+            "id": "VULN-001",
+            "type": "SQL_INJECTION",
+            "sink_block": "B2",
+            "sink_instruction": "CALL executeSQL(query)",
+            "tainted_variable": "query",
+            "origin_source": "readInput() at Block B0",
+            "trace_path": [
+                "B0",
+                "B1",
+                "B2"
+            ],
+            "sanitized": false,
+            "message": "Untrusted input from readInput() reaches executeSQL() without passing through escapeSQL()."
+        }
+    ]
+}
