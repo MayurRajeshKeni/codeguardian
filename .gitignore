@@ -1,0 +1,30 @@
+# Compiler outputs
+core/src/lex.yy.c
+core/src/parser.tab.c
+core/src/parser.tab.h
+core/bin/
+compiler_core/src/lex.yy.c
+compiler_core/src/parser.tab.c
+compiler_core/src/parser.tab.h
+compiler_core/bin/
+*.o
+*.out
+*.exe
+
+# Node dependencies & builds
+node_modules/
+dist/
+.env
+
+# Python artifacts
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# OS & Editor artifacts
+.DS_Store
+Thumbs.db
+*.swp
+.vscode/
+.idea/
