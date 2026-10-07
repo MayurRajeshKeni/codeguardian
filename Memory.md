@@ -23,18 +23,24 @@
 - [x] **[Phase 1]** Define deterministic Mini-C grammar bounds (no pointers, no dynamic heap, strict scalar types)
 - [x] **[Phase 1]** Review & freeze `AST.json` and `CFG.json` data contracts with Member 2
 - [x] **[Phase 1]** Initial `.gitignore` setup for compiler build artifacts (`lex.yy.c`, `parser.tab.*`, `*.o`, `*.exe`)
+- [x] **[Phase 1]** Setup C Toolchain (`gcc` 15.2, `flex` 2.6.4, `bison` 3.8.2, GNU `make` 4.4.1, CMake) with portable root & core Makefiles
+- [x] **[Phase 1]** Formalize rigorous BNF grammar specification for Mini-C in `compiler_core/BNF_Grammar.md`
+- [x] **[Phase 1]** Author `scanner.l` token definitions with line/column tracking & structured error diagnostics
+- [x] **[Phase 1]** Author initial LALR(1) `parser.y` eliminating all shift/reduce conflicts (0 conflicts)
+- [x] **[Phase 1]** Verify zero lexical collisions across keywords, identifiers, and multi-char operators
+- [x] **[Phase 1]** Build CLI test harness (`codeguardian-frontend`) with `--lex` and `--parse` flags
+- [x] **[Phase 1]** Create automated test runner (`scripts/run_tests.ps1`) and unit tests (6/6 tests passing)
+- [x] **[Phase 1]** Author standard test cases in `examples/` (`clean_flow.c`, `sql_injection.c`, `command_injection.c`, `complex_loop.c`)
+- [x] **[Phase 1]** Establish `mock_CFG.json` and `mock_Audit.json` satisfying Milestone Acceptance Gate 1
 
 #### 🟡 In Progress / Next Up
-- [ ] **[Phase 2]** Author `compiler_core/src/scanner.l` (Flex token specs for keywords, identifiers, literals, operators)
-- [ ] **[Phase 2]** Author `compiler_core/src/parser.y` (Bison LALR(1) grammar; resolve dangling-else with `%nonassoc`)
 - [ ] **[Phase 2]** Implement `ast.h` / `ast.c` (In-memory AST node allocators, node types, and AST print/JSON routines)
+- [ ] **[Phase 2]** Implement `tac.h` / `tac.c` (Syntax-Directed Translation lowering AST to linear TAC quadruples)
 
 #### ⚪ Backlog
-- [ ] **[Phase 2]** Implement `tac.h` / `tac.c` (Syntax-Directed Translation lowering AST to linear TAC quadruples)
 - [ ] **[Phase 2]** Implement Dragon Book 3-rule leader partitioning algorithm
 - [ ] **[Phase 2]** Implement `cfg.h` / `cfg.c` (Group basic blocks and wire true/false/unconditional directed edges)
 - [ ] **[Phase 2]** Implement `json_emit.c` (Serialize basic blocks and edges into valid `CFG.json`)
-- [ ] **[Phase 2]** Unit test suite in `compiler_core/tests/` (`test_simple.c`, `test_branch.c`, `test_loop.c`)
 
 ---
 

@@ -1,0 +1,73 @@
+{
+  "timestamp": "2026-10-06T23:35:00Z",
+  "programSummary": {
+    "totalBlocks": 5,
+    "totalInstructions": 9,
+    "vulnerabilitiesFound": 1
+  },
+  "latticeStates": {
+    "B0": {
+      "in": [],
+      "gen": ["x", "t0"],
+      "kill": [],
+      "out": ["x", "t0"]
+    },
+    "B1": {
+      "in": ["x", "t0"],
+      "gen": [],
+      "kill": ["x"],
+      "out": ["t0"]
+    },
+    "B2": {
+      "in": ["x", "t0"],
+      "gen": [],
+      "kill": [],
+      "out": ["x", "t0"]
+    },
+    "B3": {
+      "in": ["x", "t0"],
+      "gen": [],
+      "kill": [],
+      "out": ["x", "t0"]
+    },
+    "B4": {
+      "in": ["x", "t0"],
+      "gen": [],
+      "kill": [],
+      "out": ["x", "t0"]
+    }
+  },
+  "blockStatus": {
+    "B0": "TAINTED",
+    "B1": "SANITIZED",
+    "B2": "TAINTED",
+    "B3": "VULNERABLE",
+    "B4": "CLEAN"
+  },
+  "vulnerabilities": [
+    {
+      "id": "VULN-001",
+      "type": "SQL_INJECTION",
+      "cwe": "CWE-89",
+      "severity": "CRITICAL",
+      "variable": "x",
+      "sinkInstruction": {
+        "block": "B3",
+        "instructionIndex": 7,
+        "op": "CALL",
+        "sinkFunction": "execute_query",
+        "taintedArg": "x",
+        "line": 9
+      },
+      "sourceInstruction": {
+        "block": "B0",
+        "instructionIndex": 0,
+        "sourceFunction": "read_input",
+        "assignedTo": "x",
+        "line": 4
+      },
+      "taintPath": ["B0", "B2", "B3"],
+      "remediation": "Ensure variable 'x' is sanitized along the False branch (B2) prior to invoking 'execute_query'."
+    }
+  ]
+}

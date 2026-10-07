@@ -6,6 +6,7 @@ core/bin/
 compiler_core/src/lex.yy.c
 compiler_core/src/parser.tab.c
 compiler_core/src/parser.tab.h
+compiler_core/src/parser.output
 compiler_core/bin/
 *.o
 *.out
