@@ -97,9 +97,9 @@ All project governance, theoretical specifications, roadmaps, and presentation s
 | **Visual Design & Graph Styling** | Dark terminal UI design tokens, Cytoscape.js layouts, color schemes, drawer interactions | [DOC/Design.md](file:///c:/Users/asus/OneDrive/Documents/Projects/CD_CodeGuardian/DOC/Design.md) |
 | **Live State Ledger & Memory** | Real-time sprint task board, contract lock states, completed checkpoints | [DOC/Memory.md](file:///c:/Users/asus/OneDrive/Documents/Projects/CD_CodeGuardian/DOC/Memory.md) |
 | **Development Log & Viva Guide** | Detailed daily engineering log, algorithm complexity, and interview quick-checks | [DOC/devlog.md](file:///c:/Users/asus/OneDrive/Documents/Projects/CD_CodeGuardian/DOC/devlog.md) |
-| **Mini-C BNF Grammar** | Formal Backus-Naur Form grammar, precedence table, and ambiguity disambiguation rules | [DOC/BNF_Grammar.md](file:///c:/Users/asus/OneDrive/Documents/Projects/CD_CodeGuardian/DOC/BNF_Grammar.md) |
+| **Mini-C BNF Grammar** | Formal Backus-Naur Form grammar, precedence table, and ambiguity disambiguation rules | [compiler_core/BNF_Grammar.md](file:///c:/Users/asus/OneDrive/Documents/Projects/CD_CodeGuardian/compiler_core/BNF_Grammar.md) |
 | **Full Project Presentation (PDF)** | Comprehensive slide deck connecting syllabus theory to CodeGuardian implementation | [DOC/CodeGuardian Full Presentation.pdf](file:///c:/Users/asus/OneDrive/Documents/Projects/CD_CodeGuardian/DOC/CodeGuardian%20Full%20Presentation.pdf) |
-| **Project Review 1 Presentation (PDF)** | Phase 1 & 2 design review presentation for university evaluators | [DOC/CodeGuardian_ProjectReview1.pdf](file:///c:/Users/asus/OneDrive/Documents/Projects/CD_CodeGuardian/DOC/CodeGuardian_ProjectReview1.pdf) |
+| **Project Review 1 Presentation (PDF)** | Phase 1 & 2 design review presentation for university evaluators | [DOC/CodeGuardian_ProjectReview1.pdf](file:///c:/Users/asus/OneDrive/Documents/Projects/CD_CodeGuardian/DOC/CodeGuardian%20ProjectReview1.pdf) |
 | **Architecture Diagram (PDF)** | High-resolution architectural poster from Compiler Core to Security Solver | [DOC/Compiler Core to Security_Arch_diag.pdf](file:///c:/Users/asus/OneDrive/Documents/Projects/CD_CodeGuardian/DOC/Compiler%20Core%20to%20Security_Arch_diag.pdf) |
 
 ---
@@ -122,12 +122,12 @@ CD_CodeGuardian/
 │   ├── Design.md
 │   ├── Memory.md
 │   ├── devlog.md
-│   ├── BNF_Grammar.md
 │   ├── CodeGuardian Full Presentation.pdf
 │   ├── CodeGuardian_ProjectReview1.pdf
 │   └── Compiler Core to Security_Arch_diag.pdf
 │
 ├── compiler_core/                         # [Member 1] Front-End & Middle-End
+│   ├── BNF_Grammar.md                     # Mini-C formal BNF grammar
 │   ├── Makefile                           # Toolchain build script (Flex, Bison, GCC)
 │   ├── CMakeLists.txt                     # CMake build configuration
 │   ├── src/
