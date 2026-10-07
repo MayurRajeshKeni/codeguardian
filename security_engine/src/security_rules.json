@@ -1,0 +1,16 @@
+{
+  "sources": [
+    { "name": "read_input", "taintsResult": true },
+    { "name": "get_param", "taintsResult": true }
+  ],
+  "sanitizers": [
+    { "name": "sanitize", "cleansArgIndex": 0, "cleansResult": true },
+    { "name": "escape_sql", "cleansArgIndex": 0, "cleansResult": true },
+    { "name": "html_encode", "cleansArgIndex": 0, "cleansResult": true }
+  ],
+  "sinks": [
+    { "name": "execute_query", "vulnerableArgIndex": 0, "cwe": "CWE-89", "type": "SQL_INJECTION", "severity": "CRITICAL" },
+    { "name": "system_exec", "vulnerableArgIndex": 0, "cwe": "CWE-78", "type": "COMMAND_INJECTION", "severity": "CRITICAL" },
+    { "name": "render_output", "vulnerableArgIndex": 0, "cwe": "CWE-79", "type": "XSS", "severity": "HIGH" }
+  ]
+}

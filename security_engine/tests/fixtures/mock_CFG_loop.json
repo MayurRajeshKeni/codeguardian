@@ -1,0 +1,67 @@
+{
+  "version": "1.0",
+  "entryBlock": "B0",
+  "exitBlock": "B4",
+  "variables": ["x", "y", "i", "t0", "t1"],
+  "blocks": [
+    {
+      "id": "B0",
+      "label": "Entry Block",
+      "instructions": [
+        { "index": 0, "op": "CALL", "arg1": "read_input", "arg2": null, "result": "t0", "line": 3 },
+        { "index": 1, "op": "ASSIGN", "arg1": "0", "arg2": null, "result": "x", "line": 4 },
+        { "index": 2, "op": "ASSIGN", "arg1": "0", "arg2": null, "result": "y", "line": 5 },
+        { "index": 3, "op": "ASSIGN", "arg1": "0", "arg2": null, "result": "i", "line": 6 }
+      ],
+      "predecessors": [],
+      "successors": ["B1"]
+    },
+    {
+      "id": "B1",
+      "label": "Loop Header",
+      "instructions": [
+        { "index": 4, "op": "LT", "arg1": "i", "arg2": "10", "result": "t1", "line": 7 },
+        { "index": 5, "op": "IF_FALSE", "arg1": "t1", "arg2": null, "result": "L2", "line": 7 }
+      ],
+      "predecessors": ["B0", "B2"],
+      "successors": ["B2", "B3"]
+    },
+    {
+      "id": "B2",
+      "label": "Loop Body",
+      "instructions": [
+        { "index": 6, "op": "ASSIGN", "arg1": "y", "arg2": null, "result": "x", "line": 8 },
+        { "index": 7, "op": "ASSIGN", "arg1": "t0", "arg2": null, "result": "y", "line": 9 },
+        { "index": 8, "op": "ADD", "arg1": "i", "arg2": "1", "result": "i", "line": 10 },
+        { "index": 9, "op": "GOTO", "arg1": null, "arg2": null, "result": "L1", "line": 10 }
+      ],
+      "predecessors": ["B1"],
+      "successors": ["B1"]
+    },
+    {
+      "id": "B3",
+      "label": "Loop Exit",
+      "instructions": [
+        { "index": 10, "op": "CALL", "arg1": "execute_query", "arg2": "x", "result": null, "line": 12 }
+      ],
+      "predecessors": ["B1"],
+      "successors": ["B4"]
+    },
+    {
+      "id": "B4",
+      "label": "Exit Block",
+      "instructions": [
+        { "index": 11, "op": "RETURN", "arg1": "0", "arg2": null, "result": null, "line": 13 }
+      ],
+      "predecessors": ["B3"],
+      "successors": []
+    }
+  ],
+  "edges": [
+    { "from": "B0", "to": "B1", "type": "UNCONDITIONAL" },
+    { "from": "B1", "to": "B2", "type": "TRUE_BRANCH" },
+    { "from": "B1", "to": "B3", "type": "FALSE_BRANCH" },
+    { "from": "B2", "to": "B1", "type": "UNCONDITIONAL" },
+    { "from": "B3", "to": "B4", "type": "UNCONDITIONAL" }
+  ]
+}

@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "codeguardian/audit.schema.json",
+  "title": "Audit.json contract (Architecture.md 3.3)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["timestamp", "programSummary", "latticeStates", "blockStatus", "vulnerabilities"],
+  "properties": {
+    "timestamp": { "type": "string" },
+    "programSummary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["totalBlocks", "totalInstructions", "vulnerabilitiesFound"],
+      "properties": {
+        "totalBlocks": { "type": "integer", "minimum": 0 },
+        "totalInstructions": { "type": "integer", "minimum": 0 },
+        "vulnerabilitiesFound": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "latticeStates": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["in", "gen", "kill", "out"],
+        "properties": {
+          "in": { "type": "array", "items": { "type": "string" } },
+          "gen": { "type": "array", "items": { "type": "string" } },
+          "kill": { "type": "array", "items": { "type": "string" } },
+          "out": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    },
+    "blockStatus": {
+      "type": "object",
+      "additionalProperties": { "enum": ["CLEAN", "TAINTED", "SANITIZED", "VULNERABLE"] }
+    },
+    "vulnerabilities": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "type", "cwe", "severity", "variable", "sinkInstruction", "sourceInstruction", "taintPath", "remediation"],
+        "properties": {
+          "id": { "type": "string" },
+          "type": { "type": "string" },
+          "cwe": { "type": "string", "pattern": "^CWE-[0-9]+$" },
+          "severity": { "enum": ["LOW", "MEDIUM", "HIGH", "CRITICAL"] },
+          "variable": { "type": "string" },
+          "sinkInstruction": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["block", "instructionIndex", "op", "sinkFunction", "taintedArg", "line"],
+            "properties": {
+              "block": { "type": "string" },
+              "instructionIndex": { "type": "integer", "minimum": 0 },
+              "op": { "type": "string" },
+              "sinkFunction": { "type": "string" },
+              "taintedArg": { "type": "string" },
+              "line": { "type": "integer", "minimum": 1 }
+            }
+          },
+          "sourceInstruction": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["block", "instructionIndex", "sourceFunction", "assignedTo", "line"],
+            "properties": {
+              "block": { "type": "string" },
+              "instructionIndex": { "type": "integer", "minimum": 0 },
+              "sourceFunction": { "type": "string" },
+              "assignedTo": { "type": "string" },
+              "line": { "type": "integer", "minimum": 1 }
+            }
+          },
+          "taintPath": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+          "remediation": { "type": "string" }
+        }
+      }
+    }
+  }
+}

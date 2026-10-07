@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "codeguardian/cfg.schema.json",
+  "title": "CFG.json contract (Architecture.md 3.2)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "entryBlock", "exitBlock", "variables", "blocks", "edges"],
+  "properties": {
+    "version": { "type": "string" },
+    "entryBlock": { "type": "string", "pattern": "^B[0-9]+$" },
+    "exitBlock": { "type": "string", "pattern": "^B[0-9]+$" },
+    "variables": { "type": "array", "items": { "type": "string" } },
+    "blocks": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "label", "instructions", "predecessors", "successors"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^B[0-9]+$" },
+          "label": { "type": "string" },
+          "instructions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["index", "op", "arg1", "arg2", "result", "line"],
+              "properties": {
+                "index": { "type": "integer", "minimum": 0 },
+                "op": { "type": "string", "pattern": "^[A-Z_]+$" },
+                "arg1": { "type": ["string", "null"] },
+                "arg2": { "type": ["string", "null"] },
+                "result": { "type": ["string", "null"] },
+                "line": { "type": "integer", "minimum": 1 }
+              }
+            }
+          },
+          "predecessors": { "type": "array", "items": { "type": "string", "pattern": "^B[0-9]+$" } },
+          "successors": { "type": "array", "items": { "type": "string", "pattern": "^B[0-9]+$" } }
+        }
+      }
+    },
+    "edges": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["from", "to", "type"],
+        "properties": {
+          "from": { "type": "string", "pattern": "^B[0-9]+$" },
+          "to": { "type": "string", "pattern": "^B[0-9]+$" },
+          "type": { "enum": ["TRUE_BRANCH", "FALSE_BRANCH", "UNCONDITIONAL"] }
+        }
+      }
+    }
+  }
+}

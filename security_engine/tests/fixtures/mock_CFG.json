@@ -1,0 +1,64 @@
+{
+  "version": "1.0",
+  "entryBlock": "B0",
+  "exitBlock": "B4",
+  "variables": ["x", "y", "t0", "t1"],
+  "blocks": [
+    {
+      "id": "B0",
+      "label": "Entry Block",
+      "instructions": [
+        { "index": 0, "op": "CALL", "arg1": "read_input", "arg2": null, "result": "t0", "line": 4 },
+        { "index": 1, "op": "ASSIGN", "arg1": "t0", "arg2": null, "result": "x", "line": 4 },
+        { "index": 2, "op": "GT", "arg1": "x", "arg2": "10", "result": "t1", "line": 5 },
+        { "index": 3, "op": "IF_FALSE", "arg1": "t1", "arg2": null, "result": "L1", "line": 5 }
+      ],
+      "predecessors": [],
+      "successors": ["B1", "B2"]
+    },
+    {
+      "id": "B1",
+      "label": "Then Branch",
+      "instructions": [
+        { "index": 4, "op": "CALL", "arg1": "sanitize", "arg2": "x", "result": "x", "line": 6 },
+        { "index": 5, "op": "GOTO", "arg1": null, "arg2": null, "result": "L2", "line": 7 }
+      ],
+      "predecessors": ["B0"],
+      "successors": ["B3"]
+    },
+    {
+      "id": "B2",
+      "label": "Else Branch",
+      "instructions": [
+        { "index": 6, "op": "NOP", "arg1": null, "arg2": null, "result": null, "line": 8 }
+      ],
+      "predecessors": ["B0"],
+      "successors": ["B3"]
+    },
+    {
+      "id": "B3",
+      "label": "Merge Block",
+      "instructions": [
+        { "index": 7, "op": "CALL", "arg1": "execute_query", "arg2": "x", "result": null, "line": 9 }
+      ],
+      "predecessors": ["B1", "B2"],
+      "successors": ["B4"]
+    },
+    {
+      "id": "B4",
+      "label": "Exit Block",
+      "instructions": [
+        { "index": 8, "op": "RETURN", "arg1": "0", "arg2": null, "result": null, "line": 10 }
+      ],
+      "predecessors": ["B3"],
+      "successors": []
+    }
+  ],
+  "edges": [
+    { "from": "B0", "to": "B1", "type": "TRUE_BRANCH" },
+    { "from": "B0", "to": "B2", "type": "FALSE_BRANCH" },
+    { "from": "B1", "to": "B3", "type": "UNCONDITIONAL" },
+    { "from": "B2", "to": "B3", "type": "UNCONDITIONAL" },
+    { "from": "B3", "to": "B4", "type": "UNCONDITIONAL" }
+  ]
+}
