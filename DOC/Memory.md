@@ -33,14 +33,19 @@
 - [x] **[Phase 1]** Author standard test cases in `examples/` (`clean_flow.c`, `sql_injection.c`, `command_injection.c`, `complex_loop.c`)
 - [x] **[Phase 1]** Establish `mock_CFG.json` and `mock_Audit.json` satisfying Milestone Acceptance Gate 1
 
+- [x] **[Phase 2]** Implement `ast.h` / `ast.c` (In-memory AST node allocators, node types, and AST print/JSON routines)
+- [x] **[Phase 2]** Implement `tac.h` / `tac.c` (Syntax-Directed Translation lowering AST to linear TAC quadruples)
+- [x] **[Phase 2]** Implement Dragon Book 3-rule leader partitioning algorithm (`cfg.c`)
+- [x] **[Phase 2]** Implement `cfg.h` / `cfg.c` (Form basic blocks and wire true/false/unconditional directed edges)
+- [x] **[Phase 2]** Implement `json_emit.h` / `json_emit.c` (Serialize basic blocks and edges into valid `CFG.json`)
+- [x] **[Phase 2]** Verify Milestone Acceptance Gate 2 (`codeguardian-frontend` compiles `clean_flow.c`, `sql_injection.c`, `command_injection.c`, `complex_loop.c` to valid `CFG.json`)
+
 #### 🟡 In Progress / Next Up
-- [ ] **[Phase 2]** Implement `ast.h` / `ast.c` (In-memory AST node allocators, node types, and AST print/JSON routines)
-- [ ] **[Phase 2]** Implement `tac.h` / `tac.c` (Syntax-Directed Translation lowering AST to linear TAC quadruples)
+- [ ] **[Phase 3]** End-to-End Pipeline Integration with Member 2 Solver (`codeguardian-frontend code.c | codeguardian-engine` $\to$ `Audit.json`)
 
 #### ⚪ Backlog
-- [ ] **[Phase 2]** Implement Dragon Book 3-rule leader partitioning algorithm
-- [ ] **[Phase 2]** Implement `cfg.h` / `cfg.c` (Group basic blocks and wire true/false/unconditional directed edges)
-- [ ] **[Phase 2]** Implement `json_emit.c` (Serialize basic blocks and edges into valid `CFG.json`)
+- [ ] **[Phase 3]** Integration acceptance tests across all CWE scenarios
+- [ ] **[Phase 5]** End-to-end performance benchmarking (< 300ms target)
 
 ---
 

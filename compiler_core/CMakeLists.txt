@@ -33,5 +33,9 @@ add_executable(codeguardian-frontend
     ${BISON_MiniCParser_OUTPUTS}
     ${FLEX_MiniCLexer_OUTPUTS}
     ${SRC_DIR}/tokens.c
+    ${SRC_DIR}/ast.c
+    ${SRC_DIR}/tac.c
+    ${SRC_DIR}/cfg.c
+    ${SRC_DIR}/json_emit.c
     ${SRC_DIR}/main.c
 )

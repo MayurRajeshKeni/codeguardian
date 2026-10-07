@@ -110,3 +110,79 @@ Achieving a clean LALR(1) grammar with **zero shift/reduce conflicts** guarantee
 6. `test_invalid.c`: Confirmed that illegal characters (`@`, `$`) trigger fail-closed diagnostics with exact line and column numbers.
 
 ---
+
+# Development Log - Session 3 (Day 3)
+
+## 1. What Was Built Today (High-Level Summary)
+Completed **Member 1 Phase 2 (Frontend & Middle-End Lowering)**:
+- **AST Synthesis Engine** (`compiler_core/src/ast.h`, `ast.c`): In-memory tree allocators with full recursive destruction (`ast_free`), tree inspection (`ast_print`), and JSON serialization (`ast_to_json`).
+- **Bison Parser Integration** (`compiler_core/src/parser.y`): Wired semantic reduction rules in Bison to build the AST in-memory with zero shift/reduce and zero reduce/reduce conflicts.
+- **Three-Address Code (TAC) Engine** (`compiler_core/src/tac.h`, `tac.c`): Implemented Syntax-Directed Translation (SDT) lowering the AST into linear quadruples (`op`, `arg1`, `arg2`, `result`) with deterministic temporary ($t_0, t_1, \dots$) and jump label ($L_0, L_1, \dots$) allocation.
+- **Dragon Book Leader Partitioning & CFG Synthesizer** (`compiler_core/src/cfg.h`, `cfg.c`): Implemented the textbook 3-rule leader partitioning algorithm to isolate basic blocks ($B_0, B_1, \dots$) and synthesized directed control-flow edges (`TRUE_BRANCH`, `FALSE_BRANCH`, `UNCONDITIONAL`).
+- **JSON Serializer** (`compiler_core/src/json_emit.h`, `json_emit.c`): Formatted and validated emission of `CFG.json` matching the frozen contract.
+- **CLI & Test Harness Upgrade** (`compiler_core/src/main.c`, `scripts/run_tests.ps1`): Added `--cfg`, `--ast`, `--tac`, and `-o` CLI options. Validated that all 6 unit tests and 4 benchmark examples pass with 100% success (10/10 tests passing). Emitted valid `CFG.json` for `clean_flow.c`, satisfying **Milestone Acceptance Gate 2**.
+
+## 2. Significance & Engineering Purpose
+This session completes the entire compiler middle-end. While Phase 1 guaranteed that syntax is valid, Phase 2 bridges the semantic gap between high-level structured programming (nested `if`, `while` loops, expressions) and low-level control-flow graphs required for monotone data-flow analysis.
+
+By lowering the AST to Three-Address Code and partitioning it into Basic Blocks via the canonical Dragon Book algorithm:
+- Complex nested expressions are linearized into simple atomic binary quadruples.
+- Control-flow jumps are made explicit with labels and branch instructions.
+- The control flow graph explicitly defines predecessor and successor sets for every block, giving Member 2's fixpoint solver the exact mathematical topology needed to compute taint lattices ($IN, OUT, GEN, KILL$).
+
+## 3. Core Code Concepts Explained Simply
+
+**Key Functions & Architectural Elements:**
+- `ast_create_node()` / `ast_add_child()` (`ast.c`) — Dynamically allocates AST nodes and child pointer arrays with checked heap allocation and safe string cloning (`safe_strdup`).
+- `ast_free()` (`ast.c`) — Recursively traverses the tree in post-order, freeing all node attributes, child arrays, and nodes to guarantee zero memory leaks.
+- `tac_lower_ast()` / `lower_expr()` / `lower_stmt()` (`tac.c`) — Syntax-Directed Translation routines that traverse the AST:
+  - For binary expressions: recursively lowers operands, generates temporary $t_i$, and emits `TAC_OP, left, right, ti`.
+  - For conditionals (`if`): evaluates condition, emits `IF_FALSE cond L_else`, lowers then-branch, emits `GOTO L_merge`, emits `LABEL L_else`, lowers else-branch, emits `LABEL L_merge`.
+  - For loops (`while`): emits `LABEL L_head`, evaluates condition, emits `IF_FALSE cond L_exit`, lowers body, emits `GOTO L_head`, emits `LABEL L_exit`.
+- `cfg_build_from_tac()` (`cfg.c`) — Executes Dragon Book 3-Rule Leader Partitioning over linear TAC quadruples:
+  1. Instruction 0 is a leader.
+  2. Any target of a jump (`IF_FALSE`, `IF_TRUE`, `GOTO`) is a leader.
+  3. Any instruction immediately following a jump or return is a leader.
+- `cfg_add_edge()` (`cfg.c`) — Links directed predecessor/successor edges and tags edge types (`TRUE_BRANCH`, `FALSE_BRANCH`, `UNCONDITIONAL`).
+- `json_emit_cfg()` (`json_emit.c`) — Serializes the graph topology into clean, valid `CFG.json` without trailing commas.
+
+**Time & Space Complexity:**
+- **AST Construction**: $\mathcal{O}(M)$ time and $\mathcal{O}(M)$ space, where $M$ is the number of tokens in the program.
+- **TAC Lowering (SDT)**: $\mathcal{O}(A)$ time where $A$ is the number of AST nodes, visiting each node in a single post-order traversal. Emits $\mathcal{O}(A)$ quadruples.
+- **Leader Partitioning & CFG Construction**: $\mathcal{O}(K)$ time where $K$ is the number of TAC instructions. Scanning instructions and mapping labels is linear $\mathcal{O}(K)$, creating blocks and edges in $\mathcal{O}(|B| + |E|)$ time.
+- **Space Complexity**: $\mathcal{O}(K)$ storing linear TAC instructions and basic block node/edge adjacency structures.
+
+**Why Not the Naive Way?**
+- *Naive CFG Construction*: Naively splitting blocks based on arbitrary semicolons or curly braces creates malformed blocks where jumps occur in the middle of a block.
+- *Why Dragon Book Leaders are Essential*: By definition, a Basic Block must have a single entry point (the leader) and a single exit point (the terminator jump/return). The 3-rule leader algorithm guarantees that if the first instruction of a block executes, all instructions within that block execute sequentially without branching out or being jumped into mid-block.
+
+## 4. Viva / Interview Quick-Check
+
+**Q:** What is Three-Address Code (TAC), and why is it preferred over the raw AST for data-flow analysis?  
+**A:** TAC is an intermediate representation where every instruction has at most one operator and at most three address operands (e.g., $x = y \text{ op } z$). While an AST represents nested hierarchical syntax, TAC linearizes computation and makes all temporary values, branches, and control flow transfers explicit, which is necessary for computing basic block transfer equations.
+
+**Q:** State the three canonical rules for identifying basic block leaders (Dragon Book Algorithm).  
+**A:**
+1. **Rule 1**: The first instruction of the intermediate code is a leader.
+2. **Rule 2**: Any instruction that is the target of a conditional or unconditional jump is a leader.
+3. **Rule 3**: Any instruction that immediately follows a conditional or unconditional jump (or return) is a leader.
+
+**Q:** How are predecessor and successor edges determined when a block ends with an `IF_FALSE` instruction?  
+**A:** When block $B_i$ ends with `IF_FALSE cond L_target`:
+- The **False Branch** edge connects $B_i \to B_{\text{target}}$ (where $B_{\text{target}}$ is the block with label `L_target`), tagged with `EDGE_FALSE_BRANCH`.
+- The **True Branch** edge connects $B_i \to B_{i+1}$ (the sequential fall-through block), tagged with `EDGE_TRUE_BRANCH`.
+
+**Q:** How does `tac_lower_ast` handle a `while` loop to guarantee correct control-flow cycles?  
+**A:** It emits:
+1. `LABEL L_head` (marking loop entry leader).
+2. Condition evaluation into temporary $t_{\text{cond}}$.
+3. `IF_FALSE t_cond L_exit` (exit branch).
+4. Lowered statements of loop body.
+5. `GOTO L_head` (unconditional back-edge jumping to loop head).
+6. `LABEL L_exit` (loop exit leader).  
+This creates a cyclic directed graph where the body block has a successor edge pointing back to the header block.
+
+**Q:** What is Milestone Acceptance Gate 2, and how was it verified?  
+**A:** Milestone Acceptance Gate 2 requires Member 1's CLI to compile `examples/clean_flow.c` and emit valid `CFG.json`. Running `codeguardian-frontend -o clean_flow.json examples/clean_flow.c` synthesized block $B_0$ with 6 sequential quadruples, which successfully validated against the `CFG.json` JSON schema. Furthermore, all 10 automated test suites passed with 0 errors.
+
+---

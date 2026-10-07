@@ -2,6 +2,7 @@
 #define CODEGUARDIAN_TOKENS_H
 
 #include <stddef.h>
+#include "ast.h"
 #include "parser.tab.h"
 
 /*
