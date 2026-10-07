@@ -20,6 +20,11 @@ function cfgIntegrity(cfg) {
   if (byId.size !== cfg.blocks.length) problems.push({ path: '/blocks', message: 'duplicate block id' });
   if (!byId.has(cfg.entryBlock)) problems.push({ path: '/entryBlock', message: 'entry block not found' });
   if (!byId.has(cfg.exitBlock)) problems.push({ path: '/exitBlock', message: 'exit block not found' });
+  for (const b of cfg.blocks) {
+    for (const ref of [...b.predecessors, ...b.successors]) {
+      if (!byId.has(ref)) problems.push({ path: `/blocks/${b.id}`, message: `references unknown block ${ref}` });
+    }
+  }
   for (const e of cfg.edges) {
     const from = byId.get(e.from);
     const to = byId.get(e.to);

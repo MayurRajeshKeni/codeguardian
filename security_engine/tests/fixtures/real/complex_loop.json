@@ -1,0 +1,150 @@
+{
+  "version": "1.0",
+  "entryBlock": "B0",
+  "exitBlock": "B3",
+  "variables": ["data", "t0", "count", "accumulator", "t1", "t2", "t3"],
+  "blocks": [
+    {
+      "id": "B0",
+      "label": "Entry Block",
+      "instructions": [
+        {
+          "index": 0,
+          "op": "CALL",
+          "arg1": "read_input",
+          "arg2": null,
+          "result": "t0",
+          "line": 3
+        },
+        {
+          "index": 1,
+          "op": "ASSIGN",
+          "arg1": "t0",
+          "arg2": null,
+          "result": "data",
+          "line": 3
+        },
+        {
+          "index": 2,
+          "op": "ASSIGN",
+          "arg1": "0",
+          "arg2": null,
+          "result": "count",
+          "line": 4
+        },
+        {
+          "index": 3,
+          "op": "ASSIGN",
+          "arg1": "0",
+          "arg2": null,
+          "result": "accumulator",
+          "line": 5
+        }
+      ],
+      "predecessors": [],
+      "successors": ["B1"]
+    },
+    {
+      "id": "B1",
+      "label": "Merge Block",
+      "instructions": [
+        {
+          "index": 4,
+          "op": "LT",
+          "arg1": "count",
+          "arg2": "5",
+          "result": "t1",
+          "line": 7
+        },
+        {
+          "index": 5,
+          "op": "IF_FALSE",
+          "arg1": "t1",
+          "arg2": null,
+          "result": "L1",
+          "line": 7
+        }
+      ],
+      "predecessors": ["B0", "B2"],
+      "successors": ["B3", "B2"]
+    },
+    {
+      "id": "B2",
+      "label": "Then Branch",
+      "instructions": [
+        {
+          "index": 6,
+          "op": "ADD",
+          "arg1": "accumulator",
+          "arg2": "data",
+          "result": "t2",
+          "line": 8
+        },
+        {
+          "index": 7,
+          "op": "ASSIGN",
+          "arg1": "t2",
+          "arg2": null,
+          "result": "accumulator",
+          "line": 8
+        },
+        {
+          "index": 8,
+          "op": "ADD",
+          "arg1": "count",
+          "arg2": "1",
+          "result": "t3",
+          "line": 9
+        },
+        {
+          "index": 9,
+          "op": "ASSIGN",
+          "arg1": "t3",
+          "arg2": null,
+          "result": "count",
+          "line": 9
+        },
+        {
+          "index": 10,
+          "op": "GOTO",
+          "arg1": null,
+          "arg2": null,
+          "result": "L0",
+          "line": 7
+        }
+      ],
+      "predecessors": ["B1"],
+      "successors": ["B1"]
+    },
+    {
+      "id": "B3",
+      "label": "Exit Block",
+      "instructions": [
+        {
+          "index": 11,
+          "op": "CALL",
+          "arg1": "execute_query",
+          "arg2": "accumulator",
+          "result": null,
+          "line": 12
+        },
+        {
+          "index": 12,
+          "op": "RETURN",
+          "arg1": "0",
+          "arg2": null,
+          "result": null,
+          "line": 13
+        }
+      ],
+      "predecessors": ["B1"],
+      "successors": []
+    }
+  ],
+  "edges": [
+    { "from": "B0", "to": "B1", "type": "UNCONDITIONAL" },
+    { "from": "B1", "to": "B3", "type": "FALSE_BRANCH" },
+    { "from": "B1", "to": "B2", "type": "TRUE_BRANCH" },
+    { "from": "B2", "to": "B1", "type": "UNCONDITIONAL" }
+  ]
+}
