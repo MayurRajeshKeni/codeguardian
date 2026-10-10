@@ -46,3 +46,15 @@ test('Audit with an unknown block status is rejected', () => {
   audit.blockStatus.B0 = 'SPICY';
   assert.equal(validateAudit(audit).valid, false);
 });
+
+test('compiler-synthesized instruction with line 0 is accepted', () => {
+  const cfg = fixture('mock_CFG.json');
+  cfg.blocks[2].instructions[0].line = 0;
+  assert.equal(validateCfg(cfg).valid, true);
+});
+
+test('negative line numbers are rejected', () => {
+  const cfg = fixture('mock_CFG.json');
+  cfg.blocks[2].instructions[0].line = -1;
+  assert.equal(validateCfg(cfg).valid, false);
+});

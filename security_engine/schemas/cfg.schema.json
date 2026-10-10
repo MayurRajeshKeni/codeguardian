@@ -32,7 +32,7 @@
                 "arg1": { "type": ["string", "null"] },
                 "arg2": { "type": ["string", "null"] },
                 "result": { "type": ["string", "null"] },
-                "line": { "type": "integer", "minimum": 1 }
+                "line": { "type": "integer", "minimum": 0, "description": "Source line; 0 for compiler-synthesized instructions" }
               }
             }
           },
