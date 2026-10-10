@@ -5,11 +5,11 @@
 
 ## 1. Project Health & Sprint Metadata
 
-- **Current State**: Phase 1 Complete (Governance & Architectural Baseline Locked)
-- **Repository Health**: 🟢 GREEN — Architecture, Data Contracts & Git Remote Linked
-- **Active Sprint**: Sprint 1 (Phase 2 Core Implementation)
+- **Current State**: Phase 4 Complete (Security Engine, API Gateway & Dashboard) — Phase 5 (Verification & Packaging) next
+- **Repository Health**: 🟢 GREEN — Compiler core, taint engine, HTTP gateway and dashboard integrated; all test suites passing
+- **Active Sprint**: Phase 5 (Verification, Benchmarking & Demo Packaging)
 - **Git Tracking**: Branch `main` tracking `origin/main` (`https://github.com/MayurRajeshKeni/codeguardian.git`)
-- **Last Sync Timestamp**: 2026-10-06T23:51:00+05:30
+- **Last Sync Timestamp**: 2026-10-10
 - **Team Size**: Exactly 2 Members
 
 ---
@@ -56,22 +56,30 @@
 - [x] **[Phase 1]** Define security threat model (Sources, Sanitizers, Sinks)
 - [x] **[Phase 1]** Specify mathematical transfer equations ($IN$, $OUT$, $GEN$, $KILL$)
 - [x] **[Phase 1]** Freeze `Audit.json` schema and create initial sample fixture
+- [x] **[Phase 1]** Formal JSON Schemas (`cfg.schema.json`, `audit.schema.json`), `validate.js` validator and fixtures (`mock_CFG.json`, `mock_CFG_loop.json`, `mock_Audit.json`) satisfying Milestone Acceptance Gate 1
 
-#### 🟡 In Progress / Next Up
-- [ ] **[Phase 2]** Setup `security_engine/` environment and author `security_rules.json` (CWE-89, CWE-78, CWE-79)
-- [ ] **[Phase 2]** Implement block-level $GEN$ and $KILL$ set extractors from TAC instructions
-- [ ] **[Phase 2]** Implement Kildall monotone worklist fixpoint solver over powerset lattice $(\mathcal{P}(V), \subseteq)$:
+- [x] **[Phase 2]** Setup `security_engine/` environment and author `security_rules.json` (CWE-89, CWE-78, CWE-79)
+- [x] **[Phase 2]** Implement block-level $GEN$ and $KILL$ set extractors from TAC instructions
+- [x] **[Phase 2]** Implement Kildall monotone worklist fixpoint solver over powerset lattice $(\mathcal{P}(V), \subseteq)$:
   $$IN[B] = \bigcup_{P \in \text{Pred}[B]} OUT[P]$$
   $$OUT[B] = GEN[B] \cup (IN[B] \setminus KILL[B])$$
+- [x] **[Phase 2]** Implement source-to-sink vulnerability path trace extractor
+- [x] **[Phase 2]** Build solver verification unit tests (`solver.test.js` against sample CFG fixtures and real compiler output)
+
+- [x] **[Phase 3]** HTTP analysis gateway (`POST /api/analyze`, `GET /api/examples`, `GET /health`) with compiler-frontend bridge (`server.js`, `compile.js`)
+- [x] **[Phase 3]** Command-line engine (`src/cli.js`): `codeguardian-frontend code.c | node src/cli.js` $\to$ `Audit.json`
+
+- [x] **[Phase 4]** Initialize Vite + React project in `dashboard/` with dark terminal styling tokens
+- [x] **[Phase 4]** Implement dual-pane layout (code pane on left, Cytoscape canvas on right)
+- [x] **[Phase 4]** Integrate Cytoscape.js with `dagre` layout and color states (Green = Clean, Cyan = Sanitized, Amber = Tainted, Red = Vulnerable)
+- [x] **[Phase 4]** Build interactive Block Detail Drawer displaying full TAC table and $IN/OUT/GEN/KILL$ sets
+- [x] **[Phase 4]** Build Vulnerability Trace Bar highlighting active attack paths on the graph (click a finding card or a vulnerable block)
+
+#### 🟡 In Progress / Next Up
+- [ ] **[Phase 4]** Replace the plain-text code pane with a Monaco/CodeMirror editor with Mini-C syntax highlighting (Phases.md Phase 4 spec)
 
 #### ⚪ Backlog
-- [ ] **[Phase 2]** Implement source-to-sink vulnerability path trace extractor
-- [ ] **[Phase 2]** Build solver verification unit tests (`solver.test.js` against sample CFG fixtures)
-- [ ] **[Phase 4]** Initialize Vite + React project in `dashboard/` with dark terminal styling tokens
-- [ ] **[Phase 4]** Implement dual-pane layout (Code editor on left, Cytoscape canvas on right)
-- [ ] **[Phase 4]** Integrate Cytoscape.js with `dagre` layout and color states (Green = Clean, Amber = Tainted, Red = Vulnerable)
-- [ ] **[Phase 4]** Build interactive Block Detail Drawer displaying full TAC table and $IN/OUT/GEN/KILL$ sets
-- [ ] **[Phase 4]** Build Vulnerability Trace Bar highlighting active attack paths on the graph
+- _None. Remaining Phase 5 work is tracked under Shared / Joint Milestones._
 
 ---
 
@@ -84,10 +92,10 @@
 - [x] **[Phase 1]** 5-Phase Roadmap ([Phases.md](file:///c:/Users/asus/OneDrive/Documents/Projects/CD_CodeGuardian/Phases.md))
 - [x] **[Phase 1]** UI & Visual Styling Spec ([Design.md](file:///c:/Users/asus/OneDrive/Documents/Projects/CD_CodeGuardian/Design.md))
 - [x] **[Phase 1]** Remote Git Repository Linked & Pushed to GitHub
+- [x] **[Phase 3]** End-to-End Pipeline Integration (`codeguardian-frontend code.c | codeguardian-engine` $\to$ `Audit.json`, also served over HTTP)
+- [x] **[Phase 3]** Integration acceptance test suite (`clean_flow.c`, `sql_injection.c`, `command_injection.c`, `complex_loop.c`) in `security_engine/tests/pipeline.test.js` and `server.test.js`
 
 #### ⚪ Backlog
-- [ ] **[Phase 3]** End-to-End Pipeline Integration (`codeguardian-frontend code.c | codeguardian-engine` $\to$ `Audit.json`)
-- [ ] **[Phase 3]** Integration acceptance test suite (`clean_flow.c`, `sql_injection.c`, `command_injection.c`, `complex_loop.c`)
 - [ ] **[Phase 5]** End-to-end benchmark timing suite (< 300ms execution target)
 - [ ] **[Phase 5]** BCSE307L / BCSE307P Academic Demo & Final Documentation Package
 
@@ -97,6 +105,7 @@
 
 ### 3.1 Contract Lock Status
 - **`CFG.json` (Member 1 $\to$ Member 2)**: 🔒 **LOCKED** ([Architecture.md §3.2](file:///c:/Users/asus/OneDrive/Documents/Projects/CD_CodeGuardian/Architecture.md#32-cfgjson-control-flow-graph-contract)). Member 2 builds against this contract independently.
+  - Clarification found during integration: an instruction's `line` may be `0` for compiler-synthesized instructions (e.g. the empty `NOP` in a merge block).
 - **`Audit.json` (Member 2 $\to$ Dashboard)**: 🔒 **LOCKED** ([Architecture.md §3.3](file:///c:/Users/asus/OneDrive/Documents/Projects/CD_CodeGuardian/Architecture.md#33-auditjson-security-findings--taint-lattice-state)).
 - **Transfer Functions (Mathematical Rigor)**: 🔒 **LOCKED**.
   $$IN[B] = \bigcup_{P \in \text{Pred}[B]} OUT[P]$$
