@@ -1,0 +1,134 @@
+{
+  "version": "1.0",
+  "entryBlock": "B0",
+  "exitBlock": "B3",
+  "variables": ["cmd", "t0", "condition", "t1", "t2"],
+  "blocks": [
+    {
+      "id": "B0",
+      "label": "Entry Block",
+      "instructions": [
+        {
+          "index": 0,
+          "op": "CALL",
+          "arg1": "get_param",
+          "arg2": "\"cmd\"",
+          "result": "t0",
+          "line": 3
+        },
+        {
+          "index": 1,
+          "op": "ASSIGN",
+          "arg1": "t0",
+          "arg2": null,
+          "result": "cmd",
+          "line": 3
+        },
+        {
+          "index": 2,
+          "op": "ASSIGN",
+          "arg1": "1",
+          "arg2": null,
+          "result": "condition",
+          "line": 4
+        },
+        {
+          "index": 3,
+          "op": "GT",
+          "arg1": "condition",
+          "arg2": "0",
+          "result": "t1",
+          "line": 6
+        },
+        {
+          "index": 4,
+          "op": "IF_FALSE",
+          "arg1": "t1",
+          "arg2": null,
+          "result": "L0",
+          "line": 6
+        }
+      ],
+      "predecessors": [],
+      "successors": ["B2", "B1"]
+    },
+    {
+      "id": "B1",
+      "label": "Then Branch",
+      "instructions": [
+        {
+          "index": 5,
+          "op": "CALL",
+          "arg1": "sanitize",
+          "arg2": "cmd",
+          "result": "t2",
+          "line": 7
+        },
+        {
+          "index": 6,
+          "op": "ASSIGN",
+          "arg1": "t2",
+          "arg2": null,
+          "result": "cmd",
+          "line": 7
+        },
+        {
+          "index": 7,
+          "op": "GOTO",
+          "arg1": null,
+          "arg2": null,
+          "result": "L1",
+          "line": 6
+        }
+      ],
+      "predecessors": ["B0"],
+      "successors": ["B3"]
+    },
+    {
+      "id": "B2",
+      "label": "Else Branch",
+      "instructions": [
+        {
+          "index": 8,
+          "op": "ASSIGN",
+          "arg1": "cmd",
+          "arg2": null,
+          "result": "cmd",
+          "line": 10
+        }
+      ],
+      "predecessors": ["B0"],
+      "successors": ["B3"]
+    },
+    {
+      "id": "B3",
+      "label": "Exit Block",
+      "instructions": [
+        {
+          "index": 9,
+          "op": "CALL",
+          "arg1": "system_exec",
+          "arg2": "cmd",
+          "result": null,
+          "line": 13
+        },
+        {
+          "index": 10,
+          "op": "RETURN",
+          "arg1": "0",
+          "arg2": null,
+          "result": null,
+          "line": 14
+        }
+      ],
+      "predecessors": ["B1", "B2"],
+      "successors": []
+    }
+  ],
+  "edges": [
+    { "from": "B0", "to": "B2", "type": "FALSE_BRANCH" },
+    { "from": "B0", "to": "B1", "type": "TRUE_BRANCH" },
+    { "from": "B1", "to": "B3", "type": "UNCONDITIONAL" },
+    { "from": "B2", "to": "B3", "type": "UNCONDITIONAL" }
+  ]
+}

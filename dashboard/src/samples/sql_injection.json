@@ -1,0 +1,50 @@
+{
+  "version": "1.0",
+  "entryBlock": "B0",
+  "exitBlock": "B0",
+  "variables": ["user_input", "t0"],
+  "blocks": [
+    {
+      "id": "B0",
+      "label": "Entry Block",
+      "instructions": [
+        {
+          "index": 0,
+          "op": "CALL",
+          "arg1": "read_input",
+          "arg2": null,
+          "result": "t0",
+          "line": 3
+        },
+        {
+          "index": 1,
+          "op": "ASSIGN",
+          "arg1": "t0",
+          "arg2": null,
+          "result": "user_input",
+          "line": 3
+        },
+        {
+          "index": 2,
+          "op": "CALL",
+          "arg1": "execute_query",
+          "arg2": "user_input",
+          "result": null,
+          "line": 4
+        },
+        {
+          "index": 3,
+          "op": "RETURN",
+          "arg1": "0",
+          "arg2": null,
+          "result": null,
+          "line": 5
+        }
+      ],
+      "predecessors": [],
+      "successors": []
+    }
+  ],
+  "edges": [
+  ]
+}
