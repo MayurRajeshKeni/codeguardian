@@ -96,7 +96,9 @@ All project governance, theoretical specifications, roadmaps, and presentation s
 | **Phase Roadmap & Acceptance Gates** | 5-phase delivery model, milestone criteria, and acceptance test gates | [DOC/Phases.md](file:///c:/Users/asus/OneDrive/Documents/Projects/CD_CodeGuardian/DOC/Phases.md) |
 | **Visual Design & Graph Styling** | Dark terminal UI design tokens, Cytoscape.js layouts, color schemes, drawer interactions | [DOC/Design.md](file:///c:/Users/asus/OneDrive/Documents/Projects/CD_CodeGuardian/DOC/Design.md) |
 | **Live State Ledger & Memory** | Real-time sprint task board, contract lock states, completed checkpoints | [DOC/Memory.md](file:///c:/Users/asus/OneDrive/Documents/Projects/CD_CodeGuardian/DOC/Memory.md) |
-| **Development Log & Viva Guide** | Detailed daily engineering log, algorithm complexity, and interview quick-checks | [DOC/devlog.md](file:///c:/Users/asus/OneDrive/Documents/Projects/CD_CodeGuardian/DOC/devlog.md) |
+| **Development Log & Dev History** | Detailed daily engineering log, algorithm complexity, and interview quick-checks | [DOC/devlog.md](file:///c:/Users/asus/OneDrive/Documents/Projects/CD_CodeGuardian/DOC/devlog.md) |
+| **Academic Viva Defense Guide** | Comprehensive syllabus alignment (Modules 1-7), code mappings, and top 20 viva defense Q&A | [DOC/Viva_Preparation_Guide.md](file:///c:/Users/asus/OneDrive/Documents/Projects/CD_CodeGuardian/DOC/Viva_Preparation_Guide.md) |
+| **SLA & Performance Benchmark Report** | Quantitative timing analysis across all benchmarks verifying < 300ms SLA (NFR-02) | [DOC/Benchmark_Report.md](file:///c:/Users/asus/OneDrive/Documents/Projects/CD_CodeGuardian/DOC/Benchmark_Report.md) |
 | **Mini-C BNF Grammar** | Formal Backus-Naur Form grammar, precedence table, and ambiguity disambiguation rules | [compiler_core/BNF_Grammar.md](file:///c:/Users/asus/OneDrive/Documents/Projects/CD_CodeGuardian/compiler_core/BNF_Grammar.md) |
 | **Full Project Presentation (PDF)** | Comprehensive slide deck connecting syllabus theory to CodeGuardian implementation | [DOC/CodeGuardian Full Presentation.pdf](file:///c:/Users/asus/OneDrive/Documents/Projects/CD_CodeGuardian/DOC/CodeGuardian%20Full%20Presentation.pdf) |
 | **Project Review 1 Presentation (PDF)** | Phase 1 & 2 design review presentation for university evaluators | [DOC/CodeGuardian_ProjectReview1.pdf](file:///c:/Users/asus/OneDrive/Documents/Projects/CD_CodeGuardian/DOC/CodeGuardian%20ProjectReview1.pdf) |
@@ -126,7 +128,7 @@ CD_CodeGuardian/
 │   ├── CodeGuardian_ProjectReview1.pdf
 │   └── Compiler Core to Security_Arch_diag.pdf
 │
-├── compiler_core/                         # [Member 1] Front-End & Middle-End
+├── compiler_core/                         # [Member 1] Front-End & Middle-End Lowering
 │   ├── BNF_Grammar.md                     # Mini-C formal BNF grammar
 │   ├── Makefile                           # Toolchain build script (Flex, Bison, GCC)
 │   ├── CMakeLists.txt                     # CMake build configuration
@@ -147,6 +149,35 @@ CD_CodeGuardian/
 │       ├── test_collision.c               # Lexical collision & operator boundary tests
 │       └── test_invalid.c                 # Fail-closed lexical/syntax error tests
 │
+├── security_engine/                       # [Member 2] Security Engine & HTTP Gateway
+│   ├── package.json                       # Dependencies (ajv) & test scripts
+│   ├── README.md                          # Engine documentation & API specifications
+│   ├── security_rules.json                # Source, Sanitizer, and Sink definitions
+│   ├── schemas/                           # Frozen JSON schemas (cfg, audit)
+│   ├── src/
+│   │   ├── auditor.js                     # Taint auditor & vulnerability path tracer
+│   │   ├── cli.js                         # Standalone analysis CLI (stdin -> Audit.json)
+│   │   ├── compile.js                     # Bridge invoking compiler frontend safely
+│   │   ├── errors.js                      # Structured diagnostic & analysis error types
+│   │   ├── lattice.js                     # Powerset lattice operations (P(V), ⊆)
+│   │   ├── rules.js                       # Security rules loader & validator
+│   │   ├── server.js                      # HTTP analysis gateway (port 8787)
+│   │   ├── solver.js                      # Kildall monotone worklist fixpoint solver
+│   │   ├── transfer.js                    # GEN/KILL & instruction transfer functions
+│   │   └── validate.js                    # Contract schema validation
+│   └── tests/                             # Test suites (solver, compile, pipeline, server)
+│
+├── dashboard/                             # [Member 2] Interactive Visual Dashboard
+│   ├── package.json                       # Dependencies (React 18, Cytoscape, Dagre, Vite)
+│   ├── vite.config.js                     # Vite build configuration & server port
+│   ├── index.html                         # Entry HTML with terminal font imports
+│   └── src/
+│       ├── main.jsx                       # React entry point
+│       ├── App.jsx                        # Dual-pane UI, source editor & audit drawer
+│       ├── Graph.jsx                      # Cytoscape.js Dagre canvas & taint highlighter
+│       ├── styles.css                     # Dark cybersecurity terminal styles
+│       └── samples/                       # Pre-bundled Mini-C benchmark programs
+│
 ├── examples/                              # Shared Test Bench & Security Scenarios
 │   ├── clean_flow.c                       # Source -> Sanitize -> Sink (0 Vulnerabilities)
 │   ├── sql_injection.c                    # Unsanitized flow to execute_query (CWE-89)
@@ -154,7 +185,7 @@ CD_CodeGuardian/
 │   └── complex_loop.c                     # Multi-iteration loop taint accumulator
 │
 └── scripts/
-    └── run_tests.ps1                      # Comprehensive automated test runner
+    └── run_tests.ps1                      # Automated comprehensive verification runner
 ```
 
 ---
@@ -168,60 +199,87 @@ CD_CodeGuardian/
 | **TAC SDT Lowering** | Member 1 | Quadruple generation, temporaries $t_i$, labels $L_i$ (`tac.c`) | 🟢 **Complete** |
 | **CFG Partitioning** | Member 1 | Dragon Book 3-Rule Leader Partitioning & edge wiring (`cfg.c`) | 🟢 **Complete** |
 | **JSON Serialization** | Member 1 | Emitting valid `CFG.json` matching frozen schema | 🟢 **Complete** |
-| **Data-Flow Math Solver** | Member 2 | Kildall monotone worklist fixpoint solver over $(\mathcal{P}(V), \subseteq)$ | 🟡 *In Progress* |
-| **Vulnerability Auditor** | Member 2 | Source-Sanitizer-Sink path tracer $\to$ `Audit.json` | 🟡 *In Progress* |
-| **Interactive Dashboard** | Member 2 | Vite + React + Cytoscape.js dual-pane UI | ⚪ *Queued* |
+| **Data-Flow Math Solver** | Member 2 | Kildall monotone worklist fixpoint solver over $(\mathcal{P}(V), \subseteq)$ | 🟢 **Complete** |
+| **Vulnerability Auditor** | Member 2 | Source-Sanitizer-Sink path tracer $\to$ `Audit.json` | 🟢 **Complete** |
+| **HTTP Analysis Gateway** | Member 2 | Zero-bloat HTTP API gateway (`/api/analyze`, `/api/examples`) | 🟢 **Complete** |
+| **Interactive Dashboard** | Member 2 | Vite + React 18 + Cytoscape.js dual-pane visual UI | 🟢 **Complete** |
 
 ---
 
 ## 6. Build & Installation Guide
 
 ### Prerequisites
-- **C Compiler**: GCC 11+ or Clang (e.g. MSYS2 UCRT64 `gcc 15.2.0` on Windows, or standard `gcc` on Linux/macOS)
-- **Lexer Generator**: GNU Flex (2.6.4+)
-- **Parser Generator**: GNU Bison (3.8.2+)
-- **Build Utilities**: GNU Make (4.4+) or CMake (3.15+)
+- **C Compiler & Tools**: GCC 11+ or Clang, GNU Flex (2.6.4+), GNU Bison (3.8.2+), GNU Make (4.4+) or CMake (3.15+)
+- **Runtime Environment**: Node.js (v18.0.0+ LTS recommended) and npm
 
-### One-Step Build
+### 1. Build Compiler Core
 From the repository root:
 ```bash
 # Build the compiler frontend binary
 make build
 
-# Run the comprehensive 10-test automated verification suite
-make test
+# Or on Windows using PowerShell:
+# ./scripts/run_tests.ps1
+```
+The compiled executable is emitted to `compiler_core/bin/codeguardian-frontend.exe` (or `codeguardian-frontend` on UNIX).
 
-# Clean build artifacts
-make clean
+### 2. Install & Start Security Engine
+```bash
+cd security_engine
+npm install
+
+# Run automated engine and pipeline test suite
+npm test
+
+# Launch the HTTP Gateway server on http://127.0.0.1:8787
+npm start
 ```
 
-The compiled executable is emitted to:
-`compiler_core/bin/codeguardian-frontend.exe` (or `codeguardian-frontend` on UNIX).
+### 3. Install & Launch Dashboard
+In a separate terminal:
+```bash
+cd dashboard
+npm install
+
+# Start the Vite development server (defaults to http://localhost:5173)
+npm run dev
+```
 
 ---
 
-## 7. CLI Usage & Options
+## 7. CLI Usage & End-to-End Execution
 
-The compiler core CLI provides versatile operational modes:
-
+### 1. Compiler Frontend CLI
 ```bash
-# 1. Synthesize Control Flow Graph and emit CFG.json (Default)
-./compiler_core/bin/codeguardian-frontend examples/clean_flow.c
+# Emit CFG.json to stdout
+./compiler_core/bin/codeguardian-frontend examples/command_injection.c
 
-# 2. Save CFG.json directly to an output file
-./compiler_core/bin/codeguardian-frontend -o clean_flow.json examples/clean_flow.c
+# Save CFG.json directly to a file
+./compiler_core/bin/codeguardian-frontend -o command_injection.json examples/command_injection.c
 
-# 3. Emit AST.json syntax tree representation
-./compiler_core/bin/codeguardian-frontend --ast examples/clean_flow.c
+# Lower AST to human-readable linear Three-Address Code (TAC)
+./compiler_core/bin/codeguardian-frontend --tac examples/command_injection.c
 
-# 4. Lower AST to human-readable linear Three-Address Code (TAC)
-./compiler_core/bin/codeguardian-frontend --tac examples/clean_flow.c
+# Inspect AST representation
+./compiler_core/bin/codeguardian-frontend --ast examples/command_injection.c
+```
 
-# 5. Stream lexical token coordinates [LINE, COL, TOKEN_TYPE, LEXEME]
-./compiler_core/bin/codeguardian-frontend --lex examples/clean_flow.c
+### 2. End-to-End Pipeline (Frontend -> Engine -> Audit.json)
+Pipe the compiler frontend's CFG output directly into the security engine CLI:
+```bash
+# On UNIX/Linux/macOS:
+./compiler_core/bin/codeguardian-frontend examples/command_injection.c | node security_engine/src/cli.js
 
-# 6. Syntax validation only (returns exit code 0 on valid, 1 on invalid)
-./compiler_core/bin/codeguardian-frontend --parse examples/clean_flow.c
+# On Windows PowerShell:
+./compiler_core/bin/codeguardian-frontend.exe examples/command_injection.c | node security_engine/src/cli.js
+```
+
+### 3. HTTP Gateway API
+Send Mini-C source code directly via HTTP POST:
+```bash
+curl -X POST http://127.0.0.1:8787/api/analyze \
+  -H "Content-Type: application/json" \
+  -d '{"source": "int main() { int x; x = read_input(); execute_query(x); return 0; }"}'
 ```
 
 ---

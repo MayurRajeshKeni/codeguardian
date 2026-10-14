@@ -186,3 +186,126 @@ This creates a cyclic directed graph where the body block has a successor edge p
 **A:** Milestone Acceptance Gate 2 requires Member 1's CLI to compile `examples/clean_flow.c` and emit valid `CFG.json`. Running `codeguardian-frontend -o clean_flow.json examples/clean_flow.c` synthesized block $B_0$ with 6 sequential quadruples, which successfully validated against the `CFG.json` JSON schema. Furthermore, all 10 automated test suites passed with 0 errors.
 
 ---
+
+# Development Log - Session 4 (Day 4)
+
+## 1. What Was Built Today (High-Level Summary)
+Completed **Member 2 Phase 2 (Data-Flow Math Engine, Fixpoint Solver & Auditor)**:
+- **Security Rules Engine** (`security_engine/src/rules.js`): Ingestion and validation of `security_rules.json` declaring untrusted Sources (`read_input`, `get_param`), Sanitizers (`sanitize`, `escape_sql`, `html_encode`), and sensitive Sinks mapped to CWE IDs (`execute_query` $\to$ CWE-89 SQLi, `system_exec` $\to$ CWE-78 Command Injection, `render_html` $\to$ CWE-79 XSS).
+- **GEN / KILL & Transfer Logic** (`security_engine/src/transfer.js`): Implemented block-level and instruction-level transfer functions. Taint propagates through variable assignments ($x = y$, $x = y \text{ op } z$), is generated on Source calls, and is killed on Sanitizer calls or constant overwrites.
+- **Lattice Math Utilities** (`security_engine/src/lattice.js`): Set operations over the powerset lattice $(\mathcal{P}(V), \subseteq)$ supporting union, difference, and subset inclusion checks.
+- **Kildall Worklist Fixpoint Solver** (`security_engine/src/solver.js`): Implemented the iterative monotone worklist solver over CFG basic blocks:
+  $$IN[B] = \bigcup_{P \in \text{Pred}[B]} OUT[P]$$
+  $$OUT[B] = GEN[B] \cup (IN[B] \setminus KILL[B])$$
+- **Taint Auditor & Path Tracer** (`security_engine/src/auditor.js`): Evaluates sink instructions against incoming and block-accumulated taint sets, detects vulnerabilities, classifies block statuses (`CLEAN`, `SANITIZED`, `TAINTED`, `VULNERABLE`), reconstructs source-to-sink trace paths, and serializes `Audit.json`.
+- **Command-Line Engine** (`security_engine/src/cli.js`): CLI utility reading `CFG.json` from stdin or file and streaming formatted `Audit.json`.
+- **Unit Test Suite** (`security_engine/tests/solver.test.js`, `validate.test.js`): Automated verification of lattice monotonicity, fixpoint convergence on branch and loop structures, and contract compliance.
+
+## 2. Significance & Engineering Purpose
+While Member 1 partitions code into control-flow topology, Member 2's data-flow solver computes actual semantic reachability of untrusted user input. 
+By casting taint tracking as an iterative forward may-analysis over a finite powerset lattice:
+- Analysis handles arbitrary branch combinations without path explosion.
+- Monotonicity guarantees deterministic convergence to the unique Least Fixed Point (LFP).
+- The auditor reconstructs exact execution paths through basic blocks from the origin source statement to the affected sink call.
+
+## 3. Core Code Concepts Explained Simply
+
+**Key Functions & Architectural Elements:**
+- `computeBlockGenKill()` (`transfer.js`) — Evaluates all TAC quadruples inside a block sequentially, updating accumulated generated taint and killed variables.
+- `solveLattice()` (`solver.js`) — Initializes worklist with all basic blocks, iterates over blocks updating $IN[B]$ and $OUT[B]$. If $OUT[B]$ changes, adds all successors $\text{Succ}[B]$ back to the worklist until the queue is empty.
+- `auditBlock()` / `traceVulnerabilityPath()` (`auditor.js`) — Flags any sink quadruple whose argument exists in the block's taint set and backtracks through predecessor blocks to find the generating source instruction.
+
+**Time & Space Complexity:**
+- **Worklist Solver**: $\mathcal{O}(|V| \times |E|)$ where $|V|$ is the number of program variables and $|E|$ is the number of CFG edges.
+- **Space Complexity**: $\mathcal{O}(|B| \times |V|)$ storing the bitset/hash set of tainted variables for each basic block.
+
+## 4. Viva / Interview Quick-Check
+
+**Q:** Why does an assignment $x = \text{const}$ act as a $KILL$ for variable $x$?  
+**A:** In data-flow analysis, overwriting a variable with a safe constant or independent literal destroys any previous data dependency on untrusted input, removing $x$ from the active taint set.
+
+**Q:** Why is the worklist algorithm more efficient than naive round-robin iteration over all blocks?  
+**A:** Naive round-robin re-evaluates every block in the program on every iteration $\mathcal{O}(|B|)$ times. The worklist algorithm only re-evaluates a block when at least one of its predecessor blocks has actually changed its $OUT$ set, skipping unaffected subgraphs.
+
+---
+
+# Development Log - Session 5 (Day 5)
+
+## 1. What Was Built Today (High-Level Summary)
+Completed **Phase 3 (Integration & HTTP Gateway)** and **Phase 4 (Interactive Cytoscape.js Dashboard)**:
+- **Compiler Bridge** (`security_engine/src/compile.js`): In-memory execution bridge invoking `codeguardian-frontend` with byte-for-byte source piping, strict timeouts, subprocess memory limits, and structured diagnostic parsing (line/column numbers).
+- **HTTP Analysis Gateway** (`security_engine/src/server.js`): Zero-dependency Node.js HTTP server (`node:http`) on port 8787:
+  - `POST /api/analyze`: Accepts `{ "source": "<Mini-C>" }` or `{ "cfg": { ... } }`, returning compiled CFG, computed `Audit.json`, and performance metadata.
+  - `GET /api/examples`: Serves standard test cases (`clean_flow.c`, `sql_injection.c`, `command_injection.c`, `complex_loop.c`).
+  - `GET /health`: Health and compiler readiness probe.
+- **Interactive React Dashboard** (`dashboard/`): Modern Vite + React 18 single-page application:
+  - `dashboard/src/App.jsx`: Dual-pane cybersecurity terminal interface with sample selector, source code editor, CFG JSON inspector, audit finding cards, block detail drawer, and live analysis dispatch.
+  - `dashboard/src/Graph.jsx`: Cytoscape.js interactive graph canvas using `cytoscape-dagre` layout. Renders blocks as rounded cards with block IDs and TAC previews, colored by security status (Emerald Green for Clean, Cyan for Sanitized, Amber for Tainted, Crimson Red for Vulnerable).
+  - **Taint Path Highlighting**: Dynamically styles edges and blocks along the vulnerable source-to-sink path with an animated crimson glow upon clicking a vulnerability card.
+- **End-to-End Pipeline & Integration Tests** (`security_engine/tests/server.test.js`, `pipeline.test.js`): Verified end-to-end execution of all 4 canonical CWE scenarios across CLI and HTTP interfaces, satisfying **Milestone Acceptance Gate 3** and **Gate 4**.
+
+## 2. Significance & Engineering Purpose
+This milestone completes the full end-to-end integration of CodeGuardian. The compiler frontend, data-flow security engine, HTTP gateway, and visual dashboard now operate as a unified, production-ready developer tool. 
+
+Evaluators and developers can write or paste Mini-C source code, execute analysis in sub-second time, and visually observe the control flow topology and vulnerability propagation paths directly on the interactive graph canvas.
+
+## 3. Core Code Concepts Explained Simply
+
+**Key Functions & Architectural Elements:**
+- `compileSource()` (`compile.js`) — Spawns `codeguardian-frontend` with temporary file/stdin piping and converts syntax errors into structured HTTP 422 diagnostics.
+- `createHttpServer()` (`server.js`) — Implements lightweight JSON routing, CORS headers for local dashboard origins, payload limit checks (1 MiB), and deterministic responses.
+- `CytoscapeComponent` (`Graph.jsx`) — Initializes Cytoscape instance, mounts Dagre layout, maps block statuses to terminal color tokens, and applies highlighted styles to nodes/edges along `taintPath`.
+- `App.jsx` — Manages state for selected example, source code, CFG graph data, active audit findings, and selected block drawer.
+
+## 4. Viva / Interview Quick-Check
+
+**Q:** How does the dashboard visually differentiate a clean program from a vulnerable one?  
+**A:** In a clean program (e.g. `clean_flow.c`), all blocks remain emerald green or cyan (sanitized), and no red warning indicators are displayed. When a vulnerability is detected (e.g. `command_injection.c`), the affected sink block turns crimson red, finding cards detail the CWE ID and remediation steps, and clicking the finding animates the exact traversal path ($B_0 \to B_2 \to B_3$) with a crimson stroke.
+
+**Q:** Why is the compiler bridge decoupled from the HTTP gateway using standard process boundaries?  
+**A:** Decoupling via subprocess execution guarantees process isolation: if a malformed source file causes a segmentation fault or memory exhaustion in native code, the HTTP server catches the process exit code fail-closed without crashing the gateway or dashboard.
+
+---
+
+# Development Log - Session 6 (Day 6)
+
+## 1. What Was Built Today (High-Level Summary)
+Completed **Member 1 & Shared Phase 5 (Verification, Benchmarking & Course Presentation Packaging)**:
+- **Performance Benchmarking Suite** (`scripts/benchmark.ps1`):
+  - Automated stopwatch-instrumented benchmark runner executing multiple iterations across all 4 canonical programs (`clean_flow.c`, `sql_injection.c`, `command_injection.c`, `complex_loop.c`).
+  - Separates front-end lowering latency (Flex + Bison + TAC + CFG) from security engine latency (Ajv validation + Kildall worklist fixpoint + path tracing).
+  - Validates PRD NFR-02 SLA (< 300 ms end-to-end execution budget).
+  - Automatically emits markdown report at `DOC/Benchmark_Report.md`.
+- **Master 5-Stage System Verification Suite** (`scripts/verify_all.ps1`):
+  - Single-command orchestration verifying all 5 Milestone Acceptance Gates:
+    1. Stage 1: Compiler core unit tests & lexer/parser tests (Gate 1 & 2).
+    2. Stage 2: Security engine & fixpoint solver test suite (62/62 passing) (Gate 2 & 3).
+    3. Stage 3: Direct end-to-end CLI pipeline (`frontend | engine`) (Gate 3).
+    4. Stage 4: Dashboard production bundle build with Vite (Gate 4).
+    5. Stage 5: End-to-end performance latency benchmarks (Gate 5).
+- **Academic Viva Defense & Syllabus Mapping Guide** (`DOC/Viva_Preparation_Guide.md`):
+  - Formal academic documentation connecting each BCSE307L / BCSE307P syllabus module (Lexical Analysis, LALR(1) Parsing, SDT, Intermediate Code Generation, Basic Block Leaders, Data-Flow Lattice Math, Application Security) directly to CodeGuardian's source code files.
+  - Comprehensive 20-question oral exam Q&A bank with theoretical and code-level answers.
+
+## 2. Significance & Engineering Purpose
+Phase 5 ensures that CodeGuardian is not merely a collection of working modules, but a rigorously benchmarked, mathematically verified, and academically defensible static analysis platform.
+
+With an end-to-end pipeline latency of ~200 ms (surpassing the 300 ms SLA with ~100 ms of margin) and all 5 Acceptance Gates passing in 9.6 seconds, the repository is turnkey-ready for course evaluators, live reviews, and developer deployment.
+
+## 3. Core Code Concepts Explained Simply
+
+**Key Functions & Architectural Elements:**
+- `scripts/benchmark.ps1` — Uses high-resolution system timers (`System.Diagnostics.Stopwatch`), eliminates warm-up process-spawn caching artifacts, averages multiple runs, and writes `DOC/Benchmark_Report.md`.
+- `scripts/verify_all.ps1` — Orchestrates the complete multi-language verification suite (C11, Node.js, React/Vite) fail-closed, ensuring any regression in grammar, solver, or UI is caught immediately.
+- `DOC/Benchmark_Report.md` — Quantitative proof that CodeGuardian fulfills PRD NFR-02 SLA across all CWE test cases.
+
+## 4. Viva / Interview Quick-Check
+
+**Q:** What was the measured end-to-end execution speed of CodeGuardian, and how does it compare to the PRD requirement?  
+**A:** PRD NFR-02 set an SLA budget of < 300 ms for small-to-medium source programs. Benchmarking across all scenarios demonstrated an average total execution time of **~200 ms** (Frontend ~25 ms + Security Engine ~175 ms), leaving approximately **100 ms of safety buffer**.
+
+**Q:** How does `scripts/verify_all.ps1` guarantee reproducibility for academic reviewers?  
+**A:** Reviewers run a single command (`powershell -File scripts/verify_all.ps1`) which deterministically exercises the C11 compiler frontend, the 62 Node.js test cases, the CLI pipeline, the Vite production build, and the timing benchmarks, confirming that all 5 Acceptance Gates pass without manual intervention.
+
+---
+
