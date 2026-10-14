@@ -1,0 +1,134 @@
+{
+  "version": "1.0",
+  "entryBlock": "B0",
+  "exitBlock": "B3",
+  "variables": ["raw_comment", "t0", "is_admin", "payload", "t1", "t2"],
+  "blocks": [
+    {
+      "id": "B0",
+      "label": "Entry Block",
+      "instructions": [
+        {
+          "index": 0,
+          "op": "CALL",
+          "arg1": "get_param",
+          "arg2": "\"comment\"",
+          "result": "t0",
+          "line": 3
+        },
+        {
+          "index": 1,
+          "op": "ASSIGN",
+          "arg1": "t0",
+          "arg2": null,
+          "result": "raw_comment",
+          "line": 3
+        },
+        {
+          "index": 2,
+          "op": "ASSIGN",
+          "arg1": "0",
+          "arg2": null,
+          "result": "is_admin",
+          "line": 4
+        },
+        {
+          "index": 3,
+          "op": "EQ",
+          "arg1": "is_admin",
+          "arg2": "1",
+          "result": "t1",
+          "line": 7
+        },
+        {
+          "index": 4,
+          "op": "IF_FALSE",
+          "arg1": "t1",
+          "arg2": null,
+          "result": "L0",
+          "line": 7
+        }
+      ],
+      "predecessors": [],
+      "successors": ["B2", "B1"]
+    },
+    {
+      "id": "B1",
+      "label": "Then Branch",
+      "instructions": [
+        {
+          "index": 5,
+          "op": "CALL",
+          "arg1": "html_encode",
+          "arg2": "raw_comment",
+          "result": "t2",
+          "line": 8
+        },
+        {
+          "index": 6,
+          "op": "ASSIGN",
+          "arg1": "t2",
+          "arg2": null,
+          "result": "payload",
+          "line": 8
+        },
+        {
+          "index": 7,
+          "op": "GOTO",
+          "arg1": null,
+          "arg2": null,
+          "result": "L1",
+          "line": 7
+        }
+      ],
+      "predecessors": ["B0"],
+      "successors": ["B3"]
+    },
+    {
+      "id": "B2",
+      "label": "Else Branch",
+      "instructions": [
+        {
+          "index": 8,
+          "op": "ASSIGN",
+          "arg1": "raw_comment",
+          "arg2": null,
+          "result": "payload",
+          "line": 11
+        }
+      ],
+      "predecessors": ["B0"],
+      "successors": ["B3"]
+    },
+    {
+      "id": "B3",
+      "label": "Exit Block",
+      "instructions": [
+        {
+          "index": 9,
+          "op": "CALL",
+          "arg1": "render_output",
+          "arg2": "payload",
+          "result": null,
+          "line": 14
+        },
+        {
+          "index": 10,
+          "op": "RETURN",
+          "arg1": "0",
+          "arg2": null,
+          "result": null,
+          "line": 15
+        }
+      ],
+      "predecessors": ["B1", "B2"],
+      "successors": []
+    }
+  ],
+  "edges": [
+    { "from": "B0", "to": "B2", "type": "FALSE_BRANCH" },
+    { "from": "B0", "to": "B1", "type": "TRUE_BRANCH" },
+    { "from": "B1", "to": "B3", "type": "UNCONDITIONAL" },
+    { "from": "B2", "to": "B3", "type": "UNCONDITIONAL" }
+  ]
+}

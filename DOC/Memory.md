@@ -80,9 +80,15 @@
 - [x] **[Phase 4]** Integrate Cytoscape.js with `dagre` layout and color states (Green = Clean, Cyan = Sanitized, Amber = Tainted, Red = Vulnerable)
 - [x] **[Phase 4]** Build interactive Block Detail Drawer displaying full TAC table and $IN/OUT/GEN/KILL$ sets
 - [x] **[Phase 4]** Build Vulnerability Trace Bar highlighting active attack paths on the graph (click a finding card or a vulnerable block)
+- [x] **[Phase 4]** Synchronized line flash jumping from finding cards to source editor with auto-scroll
+- [x] **[Phase 4]** Resizable split-pane layout with collapsible full-graph mode and minimal `>` restore toggle
+- [x] **[Phase 4]** Semantic auto-remediation patch engine & Diff Preview modal with instant "Apply Fix & Re-Analyze"
+- [x] **[Phase 4]** Multi-format security report export: OASIS SARIF 2.1.0, Full Audit JSON, and Printable PDF summary
+- [x] **[Phase 4]** Complete Dark & Light theme system with persistent toggle and adaptive Cytoscape graph nodes
+- [x] **[Phase 4]** Controlled execution guard (analysis runs strictly on "Run Static Analysis" button click)
 
 #### 🟡 In Progress / Next Up
-- _None. All Phase 2-4 objectives achieved._
+- _None. All Phase 1-5 objectives achieved and verified._
 
 #### ⚪ Backlog
 - _None. Remaining Phase 5 work is tracked under Shared / Joint Milestones._

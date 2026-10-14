@@ -309,3 +309,55 @@ With an end-to-end pipeline latency of ~200 ms (surpassing the 300 ms SLA with ~
 
 ---
 
+# Development Log - Session 7 (Day 7)
+
+## 1. What Was Built Today (High-Level Summary)
+Completed **Member 2 Interactive Dashboard Overhaul, Remediation Engine & Enterprise Security Export**:
+- **Code-to-Graph & Card Synchronization**:
+  - Clicking on "Line X" inside any vulnerability finding card auto-scrolls the Mini-C source editor directly to that instruction and fires a temporary glowing highlight flash animation.
+  - Clicking "Click to trace attack path on graph" or any block badge ($B_0 \to B_2 \to B_3$) smoothly pans and zooms the Cytoscape.js canvas to center the tainted path, activating glowing pulses on path nodes.
+- **Resizable Split-Pane & Collapsible Full-Graph Layout**:
+  - Implemented a draggable split-pane resizer allowing dynamic allocation between source code and CFG canvas.
+  - Added full-graph mode with a minimalist `>` expand toggle on the edge that smoothly restores the editor and findings.
+- **Semantic Remediation Engine & Diff Preview Modal** (`dashboard/src/remediation.js`):
+  - Automatically identifies the tainted variable and compromised sink ($execute\_query \to escape\_sql$, $system\_exec \to sanitize$, $render\_output \to html\_encode$).
+  - Computes exact line insertions for sanitizer wrappers and generates a unified visual Diff view (`diff-del` and `diff-add`).
+  - Added single-click "Apply Fix & Re-Analyze" which patches the source code and immediately re-evaluates the pipeline to confirm vulnerability eradication.
+- **Multi-Format Enterprise Security Report Export** (`dashboard/src/sarif.js`):
+  - **SARIF 2.1.0**: Generates OASIS Standard Static Analysis Results Interchange Format for GitHub Code Scanning and CI/CD ingestion with physical locations and code snippets.
+  - **Full Audit JSON**: Exports raw CFG, block lattice states ($IN/OUT/GEN/KILL$), and taint paths.
+  - **Print / PDF Summary**: CSS `@media print` layout generating executive security reports.
+- **Complete Dark & Light Theme System**:
+  - Added persistent Dark/Light theme toggle in the header with Sun/Moon icons synced with `localStorage`.
+  - Created theme tokens for editor gutters, textareas, finding cards, inspection drawers, and modals.
+  - Implemented dynamic Cytoscape.js node SVG generation switching between dark terminal cards and clean light mode cards (`#ffffff`).
+- **Refined Aesthetics & Calmed Card Styling**:
+  - Replaced all emojis with crisp SVG icons and clean badge labels (`FIX`, `SARIF`, `JSON`).
+  - Removed loud red perimeters and heavy red gradients from vulnerability cards, adopting calm theme-adaptive borders and a focused sky-blue highlight for active cards.
+  - Fixed zoom button styles and inspection drawer chips in light mode.
+- **Controlled Manual Analysis Execution**:
+  - Restricted analysis execution to the "Run Static Analysis" button, ensuring vulnerabilities are not displayed on load or template selection until the user initiates the analysis.
+
+## 2. Significance & Engineering Purpose
+A static analysis tool is only as impactful as its developer feedback loop. While the compiler core and Kildall solver provide mathematical guarantees, developers need actionable insights: exactly where the taint entered, what line triggered the sink, how to fix it, and how to export findings to automated CI/CD pipelines (e.g., GitHub Advanced Security).
+
+With SARIF 2.1.0 export, interactive line-jump syncing, semantic auto-patching, and dual-theme graph rendering, CodeGuardian bridges the gap between academic compiler design and modern DevSecOps tooling.
+
+## 3. Core Code Concepts Explained Simply
+
+**Key Functions & Architectural Elements:**
+- `generatePatch(source, vuln, cfg)` (`remediation.js`) — Parses source lines, detects the sink call line, extracts the tainted argument, and synthesizes an sanitized replacement or pre-call assignment.
+- `generateSarifReport({ audit, source, name, cfg })` (`sarif.js`) — Constructs standard SARIF JSON with `$schema: "https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json"`, rule descriptors (`CWE-89`, `CWE-78`, `CWE-79`), and exact line/column regions.
+- `generateBlockSvg(b, status, statusColor, isLight)` (`Graph.jsx`) — Dynamically renders SVG data-URIs for Cytoscape node backgrounds with crisp high-DPI typography, adapting background and text colors to the active theme.
+- `jumpToLine(lineNum)` (`App.jsx`) — Calculates exact vertical scroll offset `(line - 1) * lineHeight`, coordinates textarea and gutter scrolling smoothly, and sets temporary CSS highlight state.
+
+## 4. Viva / Interview Quick-Check
+
+**Q:** What is SARIF, and why is CodeGuardian's export capability significant for real-world CI/CD?  
+**A:** SARIF (Static Analysis Results Interchange Format, OASIS standard) is the industry standard format for static analysis output. Major platforms like GitHub, GitLab, and Azure DevOps ingest SARIF files directly to annotate pull requests with inline security alerts. Generating valid SARIF 2.1.0 demonstrates that CodeGuardian can integrate seamlessly into modern automated CI/CD pipelines.
+
+**Q:** How does CodeGuardian ensure that remediation advice is semantically aligned with the detected CWE?  
+**A:** In `security_rules.json`, every vulnerability type is bound to an authorized sanitizer function (e.g., CWE-89 SQLi requires `escape_sql()`, CWE-78 Command Injection requires `sanitize()`, CWE-79 XSS requires `html_encode()`). The remediation synthesizer looks up the required sanitizer for the rule, checks which variable was tainted, and inserts the sanitizer before the sink invocation.
+
+---
+

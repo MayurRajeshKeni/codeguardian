@@ -1,6 +1,6 @@
 ﻿# CodeGuardian Performance & SLA Verification Benchmark Report
 
-> **Generated**: 2026-10-14 11:22:18  
+> **Generated**: 2026-10-14 14:56:18  
 > **Environment**: Microsoft Windows 11 Home Single Language  
 > **CPU**: Intel(R) Core(TM) Ultra 7 255H  
 > **Target SLA**: End-to-End Latency < 300 ms (PRD NFR-02)  
@@ -15,10 +15,10 @@ Mini-C Source -> GNU Flex Lexer -> GNU Bison LALR(1) Parser -> AST -> Linear TAC
 
 | Test Program | Lines | Blocks | Edges | Vulns | Frontend (Avg) | Engine (Avg) | Total Pipeline (Avg) | Min / Max | SLA Status (< 300ms) |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| **clean_flow.c** | 8 | 1 | 0 | 0 | 19.39 ms | 131.98 ms | **151.38 ms** | 144.2 / 157.29 ms | **PASS** |
-| **sql_injection.c** | 7 | 1 | 0 | 1 | 18.7 ms | 137.82 ms | **156.52 ms** | 152.69 / 163.22 ms | **PASS** |
-| **command_injection.c** | 16 | 4 | 4 | 1 | 19.74 ms | 138.1 ms | **157.84 ms** | 152.78 / 160.98 ms | **PASS** |
-| **complex_loop.c** | 15 | 4 | 4 | 1 | 23.07 ms | 142.29 ms | **165.36 ms** | 148.68 / 177.34 ms | **PASS** |
+| **clean_flow.c** | 8 | 1 | 0 | 0 | 22.11 ms | 152.71 ms | **174.82 ms** | 161.48 / 193.97 ms | **PASS** |
+| **sql_injection.c** | 7 | 1 | 0 | 1 | 23.02 ms | 140.96 ms | **163.99 ms** | 159.47 / 168.39 ms | **PASS** |
+| **command_injection.c** | 16 | 4 | 4 | 1 | 19.32 ms | 135.62 ms | **154.94 ms** | 144.2 / 170.67 ms | **PASS** |
+| **complex_loop.c** | 15 | 4 | 4 | 1 | 20.81 ms | 135.28 ms | **156.09 ms** | 149.7 / 159.77 ms | **PASS** |
 
 ---
 
@@ -42,7 +42,7 @@ Mini-C Source -> GNU Flex Lexer -> GNU Bison LALR(1) Parser -> AST -> Linear TAC
 ## 3. SLA Verification Verdict
 
 - **PRD SLA Target**: **< 300 ms**
-- **Observed Average Total Latency**: **157.78 ms**
-- **SLA Margin**: **142.22 ms of buffer headroom**
+- **Observed Average Total Latency**: **162.46 ms**
+- **SLA Margin**: **137.54 ms of buffer headroom**
 - **Milestone Acceptance Gate 5 (Performance)**: **VERIFIED & ACCEPTED**
 
