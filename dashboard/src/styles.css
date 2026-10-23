@@ -111,7 +111,7 @@ h1 { margin: 0; font-size: 18px; color: var(--green); letter-spacing: 1px; }
 .btn-toggle-sidebar {
   background: var(--input-bg);
   border: 1px solid var(--line);
-  color: #38bdf8;
+  color: var(--text);
   font-size: 11px;
   font-weight: 700;
   padding: 6px 12px;
@@ -132,8 +132,16 @@ h1 { margin: 0; font-size: 18px; color: var(--green); letter-spacing: 1px; }
 .btn-toggle-sidebar.collapsed {
   background: rgba(56, 189, 248, 0.15);
   border-color: #38bdf8;
-  color: #38bdf8;
+  color: var(--text);
   box-shadow: 0 0 10px rgba(56, 189, 248, 0.25);
+}
+
+.light-theme .btn-toggle-sidebar {
+  color: #000000;
+}
+
+.light-theme .btn-toggle-sidebar.collapsed {
+  color: #000000;
 }
 
 .export-dropdown-wrapper {
@@ -155,10 +163,17 @@ h1 { margin: 0; font-size: 18px; color: var(--green); letter-spacing: 1px; }
   gap: 6px;
 }
 
-.btn-export:hover {
+.btn-export:hover:not(:disabled) {
   background: var(--panel-secondary);
   border-color: #38bdf8;
   color: var(--text);
+}
+
+.btn-export:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  border-color: var(--line);
+  color: var(--muted);
 }
 
 .export-menu {

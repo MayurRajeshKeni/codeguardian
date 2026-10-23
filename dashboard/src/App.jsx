@@ -480,42 +480,42 @@ export default function App() {
             {isSidebarCollapsed ? '▶▶ Show Source & Controls' : '◀◀ Full Graph'}
           </button>
 
-          {result && (
-            <div className="export-dropdown-wrapper">
-              <button
-                type="button"
-                className="btn-export"
-                onClick={() => setExportMenuOpen(!exportMenuOpen)}
-              >
-                Export Report ▾
-              </button>
-              {exportMenuOpen && (
-                <div className="export-menu">
-                  <div className="export-item" onClick={handleExportSarif}>
-                    <span className="export-pill">SARIF</span>
-                    <div>
-                      <strong>Download SARIF 2.1.0</strong>
-                      <span className="export-desc">OASIS standard for GitHub Code Scanning</span>
-                    </div>
-                  </div>
-                  <div className="export-item" onClick={handleExportJson}>
-                    <span className="export-pill">JSON</span>
-                    <div>
-                      <strong>Download Full Audit JSON</strong>
-                      <span className="export-desc">Complete CFG, lattice states & traces</span>
-                    </div>
-                  </div>
-                  <div className="export-item" onClick={handlePrintReport}>
-                    <span className="export-pill">PRINT</span>
-                    <div>
-                      <strong>Print / PDF Executive Summary</strong>
-                      <span className="export-desc">Formatted printable security report</span>
-                    </div>
+          <div className="export-dropdown-wrapper">
+            <button
+              type="button"
+              className="btn-export"
+              disabled={!result}
+              onClick={() => setExportMenuOpen(!exportMenuOpen)}
+              title={!result ? 'Run static analysis first to export reports' : 'Export reports in SARIF, JSON or PDF format'}
+            >
+              Export Report ▾
+            </button>
+            {result && exportMenuOpen && (
+              <div className="export-menu">
+                <div className="export-item" onClick={handleExportSarif}>
+                  <span className="export-pill">SARIF</span>
+                  <div>
+                    <strong>Download SARIF 2.1.0</strong>
+                    <span className="export-desc">OASIS standard for GitHub Code Scanning</span>
                   </div>
                 </div>
-              )}
-            </div>
-          )}
+                <div className="export-item" onClick={handleExportJson}>
+                  <span className="export-pill">JSON</span>
+                  <div>
+                    <strong>Download Full Audit JSON</strong>
+                    <span className="export-desc">Complete CFG, lattice states & traces</span>
+                  </div>
+                </div>
+                <div className="export-item" onClick={handlePrintReport}>
+                  <span className="export-pill">PRINT</span>
+                  <div>
+                    <strong>Print / PDF Executive Summary</strong>
+                    <span className="export-desc">Formatted printable security report</span>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </header>
 
