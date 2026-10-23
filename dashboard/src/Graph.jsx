@@ -124,7 +124,7 @@ function generateBlockSvg(b, status, statusColor, isLight = false) {
   };
 }
 
-function MiniMap({ cyInstance, pathBlocks, isExpanded, onToggle }) {
+function MiniMap({ cyInstance, pathBlocks, isExpanded, onToggle, theme }) {
   const [viewport, setViewport] = useState(null);
   const [nodesData, setNodesData] = useState([]);
   const [graphBounds, setGraphBounds] = useState({ x1: 0, y1: 0, w: 1000, h: 800 });
@@ -186,13 +186,21 @@ function MiniMap({ cyInstance, pathBlocks, isExpanded, onToggle }) {
       {isExpanded && (
         <div className="minimap-body" onClick={handleClick} title="Click to pan graph">
           <svg width={mapWidth} height={mapHeight} className="minimap-svg">
-            <rect width={mapWidth} height={mapHeight} fill="#090d14" rx="4" />
+            <rect
+              width={mapWidth}
+              height={mapHeight}
+              fill={theme === 'light' ? '#ffffff' : '#090d14'}
+              stroke={theme === 'light' ? '#cbd5e1' : 'rgba(255,255,255,0.08)'}
+              strokeWidth="1"
+              rx="4"
+            />
             {nodesData.map((n) => {
               const nx = toMapX(n.pos.x - n.w / 2);
               const ny = toMapY(n.pos.y - n.h / 2);
               const nw = Math.max(5, n.w * scale);
               const nh = Math.max(4, n.h * scale);
               const isPath = pathBlocks.includes(n.id);
+              const isLight = theme === 'light';
               return (
                 <rect
                   key={n.id}
@@ -202,7 +210,7 @@ function MiniMap({ cyInstance, pathBlocks, isExpanded, onToggle }) {
                   height={nh}
                   rx={2}
                   fill={isPath ? '#ef4444' : n.color}
-                  stroke={isPath ? '#ffffff' : 'rgba(255,255,255,0.2)'}
+                  stroke={isPath ? '#ffffff' : (isLight ? 'rgba(0, 0, 0, 0.15)' : 'rgba(255,255,255,0.2)')}
                   strokeWidth={isPath ? 1.5 : 0.5}
                 />
               );
@@ -213,8 +221,8 @@ function MiniMap({ cyInstance, pathBlocks, isExpanded, onToggle }) {
                 y={Math.max(0, toMapY(viewport.y1))}
                 width={Math.min(mapWidth, viewport.w * scale)}
                 height={Math.min(mapHeight, viewport.h * scale)}
-                fill="rgba(56, 189, 248, 0.12)"
-                stroke="#38bdf8"
+                fill={theme === 'light' ? 'rgba(14, 165, 233, 0.16)' : 'rgba(56, 189, 248, 0.12)'}
+                stroke={theme === 'light' ? '#0284c7' : '#38bdf8'}
                 strokeWidth={1.5}
                 strokeDasharray="4 2"
               />
@@ -453,6 +461,7 @@ export default function Graph({ cfg, audit, pathBlocks, focusTarget, onSelect, r
         pathBlocks={pathBlocks}
         isExpanded={minimapOpen}
         onToggle={() => setMinimapOpen(!minimapOpen)}
+        theme={theme}
       />
     </div>
   );
