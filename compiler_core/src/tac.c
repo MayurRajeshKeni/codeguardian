@@ -1,6 +1,7 @@
-#include "tac.h"
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "tac.h"
 
 static char* safe_strdup(const char *s) {
     if (!s) return NULL;

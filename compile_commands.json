@@ -1,0 +1,32 @@
+[
+  {
+    "directory": "c:/Users/asus/OneDrive/Documents/Projects/CD_CodeGuardian",
+    "command": "C:/msys64/ucrt64/bin/gcc.exe -std=c11 -Wall -Wextra -Icompiler_core/src -c compiler_core/src/ast.c",
+    "file": "compiler_core/src/ast.c"
+  },
+  {
+    "directory": "c:/Users/asus/OneDrive/Documents/Projects/CD_CodeGuardian",
+    "command": "C:/msys64/ucrt64/bin/gcc.exe -std=c11 -Wall -Wextra -Icompiler_core/src -c compiler_core/src/tac.c",
+    "file": "compiler_core/src/tac.c"
+  },
+  {
+    "directory": "c:/Users/asus/OneDrive/Documents/Projects/CD_CodeGuardian",
+    "command": "C:/msys64/ucrt64/bin/gcc.exe -std=c11 -Wall -Wextra -Icompiler_core/src -c compiler_core/src/cfg.c",
+    "file": "compiler_core/src/cfg.c"
+  },
+  {
+    "directory": "c:/Users/asus/OneDrive/Documents/Projects/CD_CodeGuardian",
+    "command": "C:/msys64/ucrt64/bin/gcc.exe -std=c11 -Wall -Wextra -Icompiler_core/src -c compiler_core/src/json_emit.c",
+    "file": "compiler_core/src/json_emit.c"
+  },
+  {
+    "directory": "c:/Users/asus/OneDrive/Documents/Projects/CD_CodeGuardian",
+    "command": "C:/msys64/ucrt64/bin/gcc.exe -std=c11 -Wall -Wextra -Icompiler_core/src -c compiler_core/src/tokens.c",
+    "file": "compiler_core/src/tokens.c"
+  },
+  {
+    "directory": "c:/Users/asus/OneDrive/Documents/Projects/CD_CodeGuardian",
+    "command": "C:/msys64/ucrt64/bin/gcc.exe -std=c11 -Wall -Wextra -Icompiler_core/src -c compiler_core/src/main.c",
+    "file": "compiler_core/src/main.c"
+  }
+]
